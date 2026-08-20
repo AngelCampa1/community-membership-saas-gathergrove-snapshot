@@ -1,0 +1,6 @@
+---
+description: 
+globs: *.cs
+alwaysApply: false
+---
+Implement server-side validation for ALL incoming DTOs as per user story rules (e.g., using FluentValidation). Implement JWT-based authorization checks for all API endpoints, including checks for club ownership (ClubId). Wrap multiple database operations (like the registration process that creates a User and a Club) in explicit EF Core transactions. Return standard HTTP status codes and structured JSON error payloads as defined in the user stories.

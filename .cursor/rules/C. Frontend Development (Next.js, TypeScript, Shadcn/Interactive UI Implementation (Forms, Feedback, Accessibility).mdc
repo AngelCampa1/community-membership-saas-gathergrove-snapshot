@@ -1,0 +1,6 @@
+---
+description: 
+globs: *.tsx,*.ts,*.js
+alwaysApply: false
+---
+For forms (e.g., "Add New Member"), implement client-side validation that mirrors server-side rules. Display user-friendly, field-specific errors. For ALL asynchronous operations (e.g., submitting a form, fetching a list), implement clear UI loading states (e.g., disabled button with a spinner). Ensure all interactive elements are accessible (keyboard navigable, ARIA attributes).

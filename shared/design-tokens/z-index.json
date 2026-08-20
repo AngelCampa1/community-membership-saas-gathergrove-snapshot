@@ -1,0 +1,20 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "name": "GatherGrove Z-Index Tokens",
+  "description": "Stacking layer tokens. Numeric values used directly on both web and mobile.",
+
+  "zIndex": {
+    "hide":     { "value": -1,    "type": "other", "description": "Hidden below document" },
+    "base":     { "value": 0,     "type": "other", "description": "Normal document flow" },
+    "docked":   { "value": 10,    "type": "other", "description": "Slightly elevated content" },
+    "dropdown": { "value": 1000,  "type": "other", "description": "Dropdown menus, tooltips, popovers" },
+    "sticky":   { "value": 1100,  "type": "other", "description": "Sticky headers, nav bars" },
+    "banner":   { "value": 1200,  "type": "other", "description": "Cookie banners, announcements" },
+    "overlay":  { "value": 1300,  "type": "other", "description": "Overlay backdrops" },
+    "modal":    { "value": 1400,  "type": "other", "description": "Modal dialogs, drawers" },
+    "popover":  { "value": 1500,  "type": "other", "description": "Floating popovers above modals" },
+    "skipLink": { "value": 1600,  "type": "other", "description": "Accessibility skip links" },
+    "toast":    { "value": 1700,  "type": "other", "description": "Toast notifications" },
+    "tooltip":  { "value": 1800,  "type": "other", "description": "Tooltips — highest layer" }
+  }
+}

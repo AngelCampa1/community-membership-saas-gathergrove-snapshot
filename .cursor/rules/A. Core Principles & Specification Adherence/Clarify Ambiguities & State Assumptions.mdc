@@ -1,0 +1,6 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Before asking for clarification, FIRST check the specific user story file in `/docs/user-stories/` for additional context and requirements details. If a user story is unclear about a data type (e.g., in a DTO), a database constraint, API detail, or business rule (e.g., the exact calculation for a member's DuesPaidUntil date), and the information is not available in the story file, you MUST ask for clarification or state a clear, reasonable assumption before proceeding.

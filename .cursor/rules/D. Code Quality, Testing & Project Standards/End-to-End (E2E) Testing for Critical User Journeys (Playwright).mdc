@@ -1,0 +1,398 @@
+---
+description: when and how to write or design e2e tests playwright 
+globs: 
+alwaysApply: false
+---
+## 14. End-to-End (E2E) Testing for Critical User Journeys (Playwright)
+
+### Prerequisites and Implementation Analysis
+**BEFORE creating any E2E tests, you MUST:**
+1. **Check the actual implementation** for the user story being tested
+2. **Use correct locators** based on the real DOM structure and component implementations
+3. **Understand the actual behavior** rather than assumed behavior
+4. **Validate real user workflows** to catch genuine bugs, not just adjust tests to match whatever the system does
+
+### Page Object Model (POM) Pattern
+**ALL E2E tests MUST follow the Page Object Model pattern:**
+- Create separate page object classes for each major page/component
+- Encapsulate element selectors and page interactions in page objects
+- Keep test logic separate from page interaction logic
+- Reuse page objects across multiple tests
+- Make page objects maintainable and readable
+
+**Enhanced E2E Testing Requirements:**
+- **Check Actual Implementation**: Before creating tests, verify the actual DOM structure, element attributes, and behavior of the implementation
+- **Use Correct Locators**: Base locators on the real implementation, not assumptions. Use data-testid attributes when available, otherwise use the most stable selectors
+- **Follow Page Object Model (POM)**: All E2E tests MUST use the Page Object Model pattern for maintainability and reusability
+- **Root Cause Analysis**: When tests fail, determine if it's a real bug in the code or an issue with the test. Fix the actual problem, not just the test
+- **Focus on Real Bug Detection**: Tests should catch genuine functionality issues, not just verify that the system behaves as the test expects 
+
+**MANDATORY: Test Step Documentation**
+Before implementing each E2E test, you MUST document the test steps as numbered comments at the beginning of each test function. This serves as both documentation and a clear test plan. Format:
+
+```typescript
+test('should perform specific action', async () => {
+  // Test Steps:
+  // 1. Navigate to login page
+  // 2. Fill in valid credentials  
+  // 3. Click login button
+  // 4. Verify redirect to dashboard
+  // 5. Validate user is authenticated
+  
+  // Implementation follows...
+});
+
+Example structure:
+```
+e2e/
+├── pages/
+│   ├── landing-page.ts
+│   ├── registration-page.ts
+│   ├── login-page.ts
+│   └── dashboard-page.ts
+├── tests/
+│   ├── 01-landing-page.spec.ts
+│   └── 02-registration.spec.ts
+└── fixtures/
+    └── test-data.ts
+```
+
+### Root Cause Analysis for Test Failures
+**When E2E tests fail, you MUST perform root cause analysis:**
+1. **Identify if it's a real bug** in the application vs. a test issue
+2. **Check if locators match actual implementation** 
+3. **Verify the expected behavior** aligns with user story requirements
+4. **Don't just adjust tests to pass** - investigate if the application behavior is correct
+5. **Fix the underlying issue** whether it's in the test or the application
+
+### Test Objectives
+The primary goal is to **catch actual bugs and ensure user stories work end-to-end**:
+- Test real user workflows as described in user stories
+- Validate critical business logic and user journeys
+- Ensure UI interactions work as expected
+- Catch regressions in core functionality
+- Verify cross-browser compatibility for critical paths
+
+When requested, generate E2E tests using Playwright for critical user journeys like the Admin Registration and Onboarding Flow (Stories 2-5) or the Online Dues Payment Flow (Story 19).
+
+### Flexible Text Validation Strategy
+**MANDATORY: Use flexible text matching to make tests resilient to UI copy changes:**
+- **Use partial text matching** with keywords instead of exact phrases
+- **Use multiple text options** with comma-separated alternatives in locators
+- **Focus on intent verification** rather than exact wording
+- **Test functionality, not copy** - verify the feature works, not specific text
+
+**Examples of Flexible Text Locators:**
+```typescript
+// ❌ BRITTLE - Exact text match
+page.locator('text=Please enter a valid email address')
+
+// ✅ FLEXIBLE - Keyword-based matching
+page.locator('text=valid email, text=email address')
+
+// ❌ BRITTLE - Exact phrase
+page.locator('text=Your 90-day free trial has started')
+
+// ✅ FLEXIBLE - Key concepts
+page.locator('text=90-day, text=free trial, text=trial')
+
+// ❌ BRITTLE - Exact button text
+page.locator('button:has-text("Create My Account")')
+
+// ✅ FLEXIBLE - Action-based
+page.locator('button:has-text("Create"), button:has-text("Account"), button[type="submit"]')
+```
+
+**Benefits:**
+- Tests survive UI copy changes and A/B testing
+- Easier maintenance when text is updated
+- Focus on functionality rather than specific wording
+- More realistic user behavior (users scan for keywords)
+
+### E2E Testing Efficiency & Debugging Prevention Strategy
+**MANDATORY: Follow this workflow to prevent spending 3+ hours debugging tests for 1 hour of implementation**
+
+#### A. Test Development Priority Order (Prevent Rabbit Holes)
+1. **Authentication Flow First** - Always ensure JWT/session management works before testing features
+2. **Happy Path Only Initially** - Get main user journeys working before edge cases
+3. **Implementation-Driven Testing** - Write tests based on actual implementation, not assumptions
+4. **Progressive Enhancement** - Add validation tests only after core flows work
+
+#### B. Common E2E Failure Patterns & Quick Fixes
+**Pattern 1: Authentication Issues**
+- **Symptom**: Tests reach pages but content doesn't load
+- **Quick Fix**: Check JWT configuration, ensure `/auth/me` endpoint works
+- **Prevention**: Test authentication separately first
+
+**Pattern 2: Multiple Element Matches (Strict Mode Violations)**
+- **Symptom**: `Error: strict mode violation: locator resolved to X elements`
+- **Quick Fix**: Use `.first()`, more specific selectors, or role-based locators
+- **Example**: `page.getByText('Welcome').first()` instead of `page.locator('text=Welcome')`
+
+**Pattern 3: Client-Side Validation Blocking Tests**
+- **Symptom**: Buttons disabled, form submission fails
+- **Quick Fix**: Use `{ force: true }` for validation tests, or focus on successful flows
+- **Prevention**: Test happy paths first, validation edge cases last
+
+**Pattern 4: Brittle Text Matching**
+- **Symptom**: Tests break when UI copy changes
+- **Quick Fix**: Use keyword-based matching: `text=keyword1, text=keyword2`
+- **Prevention**: Focus on functionality, not exact wording
+
+#### C. Efficient Debugging Workflow (Max 30 minutes per failing test)
+1. **5 min**: Check if authentication is working (session, JWT cookies)
+2. **10 min**: Verify locators match actual DOM structure with screenshots
+3. **10 min**: Simplify test to bare minimum (remove validation checks, focus on navigation)
+4. **5 min**: Document issue and move to next test if not resolved
+
+#### D. When to Skip/Simplify Tests
+**Skip These Test Types Initially:**
+- Form validation edge cases (empty fields, invalid formats)
+- Complex user interactions requiring precise timing
+- Error message text verification (focus on error state, not exact text)
+- Mobile responsiveness details (test on desktop first)
+
+**Focus on These Test Types:**
+- User registration → authentication → main page loading
+- Navigation between major pages
+- Core business logic (creating entities, viewing lists)
+- Critical user journeys end-to-end
+
+#### E. Implementation-First Testing Strategy
+**Before Writing Any E2E Test:**
+1. **Check what's actually implemented** - Read the component code
+2. **Verify API endpoints exist** - Check backend controllers
+3. **Test manually in browser first** - Understand the real user flow
+4. **Use browser dev tools** - Identify actual CSS classes and element structures
+
+**Test Based on Reality, Not Specifications:**
+- Use actual DOM attributes and classes
+- Follow the real user flow, not the designed flow
+- Test what exists now, refactor tests when implementation changes
+
+#### F. Locator Strategy Hierarchy (Most Reliable → Least Reliable)
+1. **Test IDs (PREFERRED)**: `page.getByTestId('button-login')` or `page.locator('[data-testid="button-login"]')`
+2. **Role-based**: `getByRole('button', { name: 'Submit' })`
+3. **Specific first**: `getByText('Welcome').first()`
+4. **Attribute-based**: `locator('[type="submit"]')`
+5. **Class-based**: `locator('.submit-button')`
+6. **Text-based**: `locator('text=Submit')` (most brittle)
+
+**ALWAYS use test IDs when available** - Frontend development rules require test IDs on all interactive elements following the pattern:
+- Forms: `data-testid="input-{fieldname}"`, `data-testid="button-{action}"`
+- Navigation: `data-testid="link-{destination}"`, `data-testid="nav-{section}"`
+- Content: `data-testid="section-{name}"`, `data-testid="card-{type}"`
+- States: `data-testid="error-{field}"`, `data-testid="loading-{action}"`
+
+**Never Use:**
+- Exact text matching for UI copy
+- Complex CSS selectors
+- XPath expressions
+- Element position-based selectors (nth-child)
+
+**Example Test ID Usage:**
+```typescript
+// ✅ PREFERRED - Using test IDs
+await page.getByTestId('button-login').click();
+await page.getByTestId('input-email').fill('test@example.com');
+await expect(page.getByTestId('error-email')).toBeVisible();
+
+// ✅ GOOD - Role-based when test ID not available
+await page.getByRole('button', { name: 'Submit' }).click();
+
+// ❌ AVOID - Brittle text/class selectors
+await page.locator('text=Login').click();
+await page.locator('.login-button').click();
+```
+
+This strategy prevents the "1 hour implementation, 3 hours debugging tests" anti-pattern by focusing on what matters most and providing quick resolution paths for common issues.
+
+### E2E Test Execution Standards
+**MANDATORY: Configure debugging options in playwright.config.ts rather than repeating them in every command**
+
+#### A. Test Execution Hierarchy (Most Efficient → Least Efficient)
+1. **Single Test**: `npx playwright test <file> -g "<test name>"` 
+   - Use when: Debugging specific failing test
+   - Time: ~10-30 seconds per test
+
+2. **Single Test File**: `npx playwright test <file>.spec.ts`
+   - Use when: Working on specific feature/story
+   - Time: ~2-5 minutes per file
+
+3. **Test Category**: `npx playwright test --grep "<category>"`
+   - Use when: Testing related functionality
+   - Time: ~5-15 minutes per category
+
+4. **Quick Health Check**: `npx playwright test --reporter=line --max-failures=5`
+   - Use when: Checking overall test suite status
+   - Time: ~3-10 minutes (stops after 5 failures)
+
+5. **Full Test Suite**: `npx playwright test --reporter=html,line`
+   - Use when: Final validation before deployment
+   - Time: ~15-30 minutes (only run when necessary)
+
+#### B. Mandatory Execution Rules
+**NEVER run the full test suite more than:**
+- **2 times per debugging session** (initial health check + final validation)
+- **1 time per hour** during active development
+- **3 times per day** total unless absolutely necessary
+
+**DEFAULT CONFIGURATION** (set in playwright.config.ts):
+- `trace: 'retain-on-failure'` for detailed execution traces
+- `screenshot: 'only-on-failure'` to capture visual state at failure
+- `video: 'retain-on-failure'` for complex interaction debugging
+- `reporter: ['line', 'html']` for clear output and comprehensive reports
+- **NEVER use `--headed` unless absolutely necessary** (visual debugging only)
+
+**ALWAYS captured automatically:**
+- Network requests and responses
+- Console logs and errors
+- Page screenshots at failure points
+- Detailed execution traces for failed tests
+- Browser state and authentication status
+
+#### C. Debugging Standards for Cursor Agents
+**Based on Playwright MCP Server and advanced debugging practices:**
+
+**1. JavaScript Debug Terminal (VS Code/Cursor)**
+- Open Command Palette: `Ctrl+Shift+P` (Windows) / `Cmd+Shift+P` (Mac)
+- Search: `Debug: JavaScript Debug Terminal`
+- Run tests with `--watch` flag for debugger attachment
+- Example: `npx playwright test <file> --watch --headed`
+
+**2. Accessing Playwright Debugging Artifacts**
+**CONFIRMED: AI agents CAN access Playwright debugging files for analysis**
+
+**Available debugging files:**
+- `error-context.md` - **MOST VALUABLE** - Contains detailed failure analysis with:
+  - Complete DOM snapshot at failure time
+  - Exact error details and stack trace
+  - Element locators and their states
+  - Test source code with error location
+- `test-failed-1.png` - Screenshot at failure point
+- `video.webm` - Video of test execution (binary, less useful for AI)
+- `trace.zip` - Detailed trace (binary, requires trace viewer)
+- `.last-run.json` - Summary of test run status
+
+**AI Debugging Workflow:**
+1. **Run test with configured debugging** (automatic capture)
+2. **Read `error-context.md`** from test-results directory for detailed analysis
+3. **Analyze DOM snapshot** to understand actual page state vs expected state
+4. **Check element visibility and attributes** from the snapshot
+5. **Identify root cause** from error details and page state
+
+**Example debugging command sequence:**
+```bash
+# Run failing test (captures all debug data automatically)
+npx playwright test tests/login.spec.ts -g "should login"
+
+# Analyze the captured debugging data
+# Read: test-results/<test-name>/error-context.md
+```
+
+**3. Systematic Debugging Approach**
+- **Step 1**: Identify actual vs. expected behavior
+- **Step 2**: Check implementation before assuming test issue
+- **Step 3**: Use browser dev tools to inspect real DOM structure
+- **Step 4**: Verify locators match actual implementation
+- **Step 5**: Test manually in browser to understand user flow
+
+**4. AI Agent Debugging Principles**
+- **Don't assume the test is wrong** - check if implementation matches user story
+- **Use screenshots and traces** - `npx playwright test --trace on --screenshot=only-on-failure`
+- **Capture browser context** - Check network requests, console errors, authentication state
+- **Focus on root cause** - Fix implementation issues, not just test issues
+- **Document findings** - Update page objects and test patterns for future reference
+
+**5. Advanced Debugging Commands**
+```bash
+# Debug single test (PREFERRED - all debugging data captured automatically)
+npx playwright test tests/login.spec.ts -g "should login"
+
+# Debug specific test file
+npx playwright test tests/login.spec.ts
+
+# Generate comprehensive HTML report
+npx playwright test --reporter=html,line
+
+# Health check with early failure detection
+npx playwright test --max-failures=5
+
+# Debug specific browser
+npx playwright test --project=chromium
+
+# ONLY use headed mode for visual debugging when absolutely necessary
+npx playwright test tests/login.spec.ts --headed (use sparingly)
+
+# View generated reports
+npx playwright show-report test-results/html-report
+```
+
+**6. Debugging Best Practices for AI Agents**
+- **Implementation-Driven Debugging**: Always check actual implementation before modifying tests
+- **Locator Validation**: Use browser dev tools to verify element selectors
+- **State Management**: Check authentication, session, and application state
+- **Network Analysis**: Monitor API calls and responses during test execution
+- **Progressive Simplification**: Strip complex tests to minimal failing case
+- **Documentation**: Update test patterns and page objects based on findings
+
+#### D. When Tests Fail - Decision Tree
+1. **Single test fails**: Debug that specific test using targeted execution
+2. **Multiple related tests fail**: Check common dependencies (auth, API, setup)
+3. **Random test failures**: Check for race conditions, timing issues, or state pollution
+4. **All tests fail**: Check environment setup, dependencies, or infrastructure issues
+
+#### E. Performance Guidelines
+- **Single test debugging**: Maximum 15 minutes per test
+- **Test suite health check**: Maximum 10 minutes for initial assessment
+- **Implementation verification**: Maximum 10 minutes to check actual code
+- **Documentation updates**: Maximum 5 minutes to update patterns/objects
+
+This execution standard prevents inefficient testing patterns and ensures debugging time is focused on actual issues rather than test infrastructure problems.
+
+### Unified Development & Testing Approach
+**ADVANTAGE: Test IDs are added during development, making E2E testing more reliable**
+
+#### Development-Testing Integration
+- **Frontend developers** add `data-testid` attributes as part of component implementation
+- **E2E tests** leverage these test IDs for stable, reliable locators
+- **Reduced maintenance** - tests don't break when UI text or styling changes
+- **Faster debugging** - clear element identification across development and testing
+
+#### When Test IDs Are Missing
+If test IDs are not present on elements you need to test:
+
+1. **Request test ID addition** from frontend developer following the established patterns
+2. **Temporarily use role-based locators** until test IDs are added
+3. **Document the missing test ID** in test comments for future addition
+4. **Avoid creating brittle selectors** - better to wait for proper test IDs
+
+#### Example Page Object with Test IDs
+```typescript
+export class LoginPage {
+  constructor(page: Page) {
+    this.page = page;
+    
+    // ✅ PREFERRED - Using standardized test IDs
+    this.emailInput = page.getByTestId('input-email');
+    this.passwordInput = page.getByTestId('input-password');
+    this.loginButton = page.getByTestId('button-login');
+    this.errorMessage = page.getByTestId('error-login');
+    this.loadingState = page.getByTestId('loading-login');
+  }
+  
+  async login(email: string, password: string) {
+    await this.emailInput.fill(email);
+    await this.passwordInput.fill(password);
+    await this.loginButton.click();
+    
+    // Wait for loading to complete
+    await expect(this.loadingState).toBeHidden();
+  }
+  
+  async verifyError(message: string) {
+    await expect(this.errorMessage).toBeVisible();
+    await expect(this.errorMessage).toContainText(message);
+  }
+}
+```

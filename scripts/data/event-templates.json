@@ -1,0 +1,74 @@
+{
+  "yoga": [
+    "Morning Sun Salutation",
+    "Evening Relaxation Yoga",
+    "Power Yoga Session",
+    "Gentle Yoga for Beginners",
+    "Vinyasa Flow Class",
+    "Yin Yoga & Meditation",
+    "Yoga for Flexibility",
+    "Core Strength Yoga",
+    "Restorative Yoga",
+    "Hot Yoga Challenge"
+  ],
+  "book_club": [
+    "Fiction Book Discussion",
+    "Mystery Novel Reading",
+    "Classic Literature Review",
+    "Author Meet & Greet",
+    "Poetry Reading Evening",
+    "Book Swap Social",
+    "Writing Workshop",
+    "Bestseller Discussion",
+    "Sci-Fi Fantasy Forum",
+    "Non-Fiction Deep Dive"
+  ],
+  "fitness": [
+    "Morning Spin Class",
+    "HIIT Training Session",
+    "CrossFit Workout",
+    "Personal Training Hour",
+    "Bootcamp Challenge",
+    "Strength Training",
+    "Cardio Blast",
+    "Functional Fitness",
+    "Nutrition Workshop",
+    "Wellness Seminar"
+  ],
+  "social": [
+    "Monthly Member Mixer",
+    "Annual Gala Dinner",
+    "Networking Event",
+    "Holiday Party",
+    "Summer BBQ",
+    "Coffee & Conversation",
+    "Wine Tasting Evening",
+    "Game Night",
+    "Trivia Competition",
+    "Community Volunteer Day"
+  ],
+  "educational": [
+    "Leadership Workshop",
+    "Financial Planning Seminar",
+    "Technology Training",
+    "Public Speaking Class",
+    "Career Development Session",
+    "Time Management Workshop",
+    "Stress Management Seminar",
+    "Goal Setting Workshop",
+    "Communication Skills Training",
+    "Team Building Exercise"
+  ],
+  "locations": [
+    "Main Studio",
+    "Community Center",
+    "Downtown Location",
+    "West Side Facility",
+    "East Campus",
+    "North Branch",
+    "South Location",
+    "Central Hub",
+    "Riverside Center",
+    "Lakeside Venue"
+  ]
+}

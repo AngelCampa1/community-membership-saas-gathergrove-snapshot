@@ -1,0 +1,6 @@
+---
+description: 
+globs: *.tsx,*.ts,*.js
+alwaysApply: false
+---
+Create typed TypeScript functions for all backend API calls (e.g., memberApi.ts), using interfaces derived from C# DTOs for type safety. Handle API errors robustly. Develop React components functionally with Hooks, prioritizing modularity and reusability.

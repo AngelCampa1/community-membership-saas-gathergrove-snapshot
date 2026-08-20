@@ -1,0 +1,14 @@
+# SSL Certificate Validation File
+# This file is used for SSL certificate validation by Certificate Authorities
+# Azure Static Web Apps and other hosting services may request this file
+# to verify domain ownership during SSL certificate provisioning
+#
+# File created: 2025-08-29
+# Purpose: SSL certificate domain validation
+# Status: Active
+
+SSL_CERTIFICATE_VALIDATION_ACTIVE=true
+DOMAIN_VALIDATION=gathergrove.club
+VALIDATION_DATE=2025-08-29
+VALIDATION_TYPE=DV
+CERTIFICATE_AUTHORITY=Azure_SSL_Provider

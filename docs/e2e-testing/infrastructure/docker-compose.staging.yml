@@ -1,0 +1,171 @@
+version: '3.8'
+
+# GatherGrove E2E Testing Docker Compose Configuration - Staging Environment
+# Staging configuration with production-like settings
+# Author: HIVE MIND Coder Delta
+
+services:
+  # Frontend React Application - Staging Build
+  gathergrove-web:
+    build:
+      context: ../../../client
+      dockerfile: Dockerfile
+      target: production
+    ports:
+      - "3001:3000"  # Different port for staging
+    environment:
+      - NODE_ENV=staging
+      - REACT_APP_API_URL=http://localhost:5001
+      - REACT_APP_WS_URL=ws://localhost:5001
+      - REACT_APP_ENVIRONMENT=staging
+    depends_on:
+      - gathergrove-api
+    networks:
+      - gathergrove-staging
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Backend ASP.NET Core API - Staging Configuration
+  gathergrove-api:
+    build:
+      context: ../../../backend
+      dockerfile: Dockerfile
+      target: production
+    ports:
+      - "5001:5000"  # Different port for staging
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Staging
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__DefaultConnection=Server=db,1433;Database=GatherGroveStagingTest;User Id=sa;Password=StagingTestPassword123!;TrustServerCertificate=True;
+      - ConnectionStrings__RedisConnection=redis:6379
+      - Jwt__SecretKey=GatherGroveStagingTestSecretKey2024ForE2ETesting!
+      - Jwt__Issuer=GatherGroveStaging
+      - Jwt__Audience=GatherGroveStaging
+      - Logging__LogLevel__Default=Information
+      - Logging__LogLevel__Microsoft.AspNetCore=Warning
+    depends_on:
+      - db
+      - redis
+    networks:
+      - gathergrove-staging
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 1G
+        reservations:
+          cpus: '1.0'
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # SQL Server Database - Staging
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=StagingTestPassword123!
+      - MSSQL_DATABASE=GatherGroveStagingTest
+    ports:
+      - "1434:1433"  # Different port for staging
+    volumes:
+      - db_staging_data:/var/opt/mssql
+    networks:
+      - gathergrove-staging
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '1.0'
+          memory: 1G
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P StagingTestPassword123! -Q 'SELECT 1'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # Redis Cache - Staging
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6380:6379"  # Different port for staging
+    volumes:
+      - redis_staging_data:/data
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    networks:
+      - gathergrove-staging
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Database Seeder - Staging
+  db-seeder:
+    build:
+      context: ../../../backend
+      dockerfile: Dockerfile.seeder
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=db,1433;Database=GatherGroveStagingTest;User Id=sa;Password=StagingTestPassword123!;TrustServerCertificate=True;
+      - ASPNETCORE_ENVIRONMENT=Staging
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - gathergrove-staging
+    profiles:
+      - seeding
+
+  # Load Testing Service (staging only)
+  load-tester:
+    image: loadimpact/k6:latest
+    volumes:
+      - ../scripts/load-tests:/scripts
+    depends_on:
+      - gathergrove-api
+      - gathergrove-web
+    networks:
+      - gathergrove-staging
+    profiles:
+      - load-testing
+
+networks:
+  gathergrove-staging:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16
+
+volumes:
+  db_staging_data:
+    driver: local
+  redis_staging_data:
+    driver: local

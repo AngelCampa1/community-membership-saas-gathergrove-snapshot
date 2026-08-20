@@ -1,0 +1,53 @@
+---
+description: 
+globs: *.tsx,*.ts,*.js
+alwaysApply: false
+---
+## 11. UI Implementation with Shadcn-ui & Tailwind CSS
+
+UI elements MUST be implemented by installing Shadcn/ui components and styling them with Tailwind CSS utility classes. Prioritize matching the UI/UX descriptions in the user stories.
+
+### Mandatory Test ID Requirements
+**ALL interactive elements MUST include data-testid attributes for E2E testing reliability:**
+
+#### Form Elements
+- **Inputs**: `data-testid="input-{fieldname}"` (e.g., `data-testid="input-email"`)
+- **Buttons**: `data-testid="button-{action}"` (e.g., `data-testid="button-submit"`, `data-testid="button-login"`)
+- **Checkboxes/Radio**: `data-testid="checkbox-{name}"` (e.g., `data-testid="checkbox-terms"`)
+- **Select/Dropdown**: `data-testid="select-{name}"` (e.g., `data-testid="select-country"`)
+
+#### Navigation Elements
+- **Links**: `data-testid="link-{destination}"` (e.g., `data-testid="link-login"`, `data-testid="link-register"`)
+- **Menu Items**: `data-testid="nav-{section}"` (e.g., `data-testid="nav-features"`)
+
+#### Content Areas
+- **Sections**: `data-testid="section-{name}"` (e.g., `data-testid="section-hero"`, `data-testid="section-pricing"`)
+- **Cards**: `data-testid="card-{type}"` (e.g., `data-testid="card-pricing-sprout"`)
+- **Modals**: `data-testid="modal-{purpose}"` (e.g., `data-testid="modal-confirmation"`)
+
+#### Error/Success States
+- **Error Messages**: `data-testid="error-{field}"` (e.g., `data-testid="error-email"`)
+- **Success Messages**: `data-testid="success-{action}"` (e.g., `data-testid="success-registration"`)
+- **Loading States**: `data-testid="loading-{action}"` (e.g., `data-testid="loading-submit"`)
+
+#### Example Implementation
+```tsx
+// ❌ BAD - No test ID
+<Button onClick={handleSubmit}>Register</Button>
+
+// ✅ GOOD - With test ID
+<Button data-testid="button-register" onClick={handleSubmit}>Register</Button>
+
+// ❌ BAD - No test ID  
+<input type="email" placeholder="Email" />
+
+// ✅ GOOD - With test ID
+<input data-testid="input-email" type="email" placeholder="Email" />
+```
+
+### Benefits
+- **Reliable E2E tests** - Independent of UI text changes
+- **Faster test execution** - Direct element targeting
+- **Better debugging** - Clear element identification
+
+- **Maintainable tests** - Stable locators that don't break with design changes

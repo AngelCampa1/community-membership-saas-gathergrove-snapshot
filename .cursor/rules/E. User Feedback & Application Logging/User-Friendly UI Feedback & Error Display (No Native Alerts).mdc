@@ -1,0 +1,6 @@
+---
+description: when creating an alert or UI errors
+globs: 
+alwaysApply: false
+---
+NEVER use native browser alert(). Use a toast/snackbar library like Sonner for non-blocking feedback. For form validation, display inline error messages below the relevant field.

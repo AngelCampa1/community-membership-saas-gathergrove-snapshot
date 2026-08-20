@@ -1,0 +1,164 @@
+---
+description: 
+globs: *.tsx,*.ts
+alwaysApply: false
+---
+## Frontend Testing Implementation-First Strategy - Prevent Assumption-Based Test Failures
+
+### Problem Pattern
+Writing frontend tests based on assumptions about implementation rather than actual code leads to:
+- Tests failing immediately because they don't match real component structure
+- Wasted time writing tests for non-existent elements or wrong data structures
+- Multiple test-fix cycles that could be avoided
+- Tests that don't reflect actual user behavior or component behavior
+
+### Root Cause
+**Writing tests before understanding the actual implementation details**
+
+### Solution Pattern
+**MANDATORY: Read and understand the actual implementation BEFORE writing tests**
+
+### Implementation Strategy
+
+#### 1. Pre-Test Implementation Analysis
+**ALWAYS do this BEFORE writing any test:**
+
+```typescript
+// ❌ WRONG - Writing tests based on assumptions
+describe('BillingPage', () => {
+  it('should display billing info', () => {
+    // Assuming elements exist without checking
+    expect(screen.getByText('Next billing date: 3/15/2024')).toBeInTheDocument();
+    expect(screen.getByText('$20')).toBeInTheDocument(); // Multiple elements!
+  });
+});
+```
+
+**✅ CORRECT - Implementation-first approach:**
+
+1. **Read the actual component file** (page.tsx, component.tsx)
+2. **Identify actual element structure** (what testids exist, what text is rendered)
+3. **Check data flow** (what props/state shape is expected)
+4. **Understand conditional rendering** (when elements appear/disappear)
+
+```typescript
+// After reading BillingPage component:
+// - Found testid="card-billing-status" 
+// - Found date formatting uses different format than expected
+// - Found multiple "$20" elements need specific selectors
+
+describe('BillingPage', () => {
+  it('should display billing info', () => {
+    // Test matches actual implementation structure
+    expect(screen.getByTestId('card-billing-status')).toHaveTextContent('$20');
+    expect(screen.getByText((content) => content.includes('Next billing date:'))).toBeInTheDocument();
+  });
+});
+```
+
+#### 2. Data Structure Verification
+**BEFORE writing mock data, check actual interfaces/types:**
+
+```typescript
+// ❌ WRONG - Assuming data structure
+const mockUser = {
+  clubId: 'club-123', // String assumption
+};
+
+// ✅ CORRECT - Check actual UserSession interface first
+// Found: UserSession has clubId: number, not string
+const mockUser = {
+  clubId: 123, // Matches actual interface
+};
+```
+
+#### 3. Element Selector Strategy
+**ALWAYS verify selectors exist in actual component:**
+
+```typescript
+// ❌ WRONG - Assuming elements exist
+expect(screen.getByRole('main')).toBeInTheDocument(); // Component might not have role="main"
+expect(screen.getByText('Exact Text')).toBeInTheDocument(); // Text might be split across elements
+
+// ✅ CORRECT - Use selectors that match actual implementation
+expect(screen.getByTestId('card-billing-status')).toBeInTheDocument(); // Verified testid exists
+expect(screen.getByText((content) => content.includes('Billing'))).toBeInTheDocument(); // Flexible text matching
+```
+
+#### 4. Implementation-First Workflow
+
+**MANDATORY steps for every test file:**
+
+1. **Read target component thoroughly**
+   - Identify all testids used
+   - Note conditional rendering logic
+   - Check data prop shapes and interfaces
+
+2. **Check related interfaces/types**
+   - Verify mock data matches actual TypeScript interfaces
+   - Check API response shapes if mocking API calls
+
+3. **Run component manually first** (if possible)
+   - See actual rendered output
+   - Verify behavior you're trying to test
+
+4. **Write tests that match implementation**
+   - Use exact testids that exist
+   - Match actual data structures
+   - Test actual conditional logic
+
+5. **Run tests and fix implementation gaps, not test assumptions**
+
+### Examples from Current Project
+
+**❌ WRONG approach that led to failures:**
+```typescript
+// Assumed date format without checking component
+expect(screen.getByText('Next billing date: 3/15/2024')).toBeInTheDocument();
+
+// Assumed single element with "$20" text
+expect(screen.getByText('$20')).toBeInTheDocument();
+
+// Assumed role="main" exists
+expect(screen.getByRole('main')).toBeInTheDocument();
+```
+
+**✅ CORRECT approach after reading implementation:**
+```typescript
+// Used flexible date matching after seeing component
+expect(screen.getByText((content) => content.includes('Next billing date:'))).toBeInTheDocument();
+
+// Used specific container selector to avoid multiple matches
+expect(screen.getByTestId('card-billing-status')).toHaveTextContent('$20');
+
+// Removed assumption about role="main", tested actual heading
+expect(screen.getByRole('heading', { name: 'Billing & Subscription' })).toBeInTheDocument();
+```
+
+### Time Savings
+
+**This approach prevents:**
+- ⏱️ 30+ minutes spent on test-fix cycles per component
+- 🔄 Multiple iterations of "test → fail → fix → test"
+- 🐛 Brittle tests that break with minor UI changes
+- 📝 Tests that don't reflect actual user experience
+
+**Results in:**
+- ✅ Tests pass on first run (or fail for real bugs)
+- ✅ Tests that survive UI changes  
+- ✅ Faster development iteration
+- ✅ More reliable test suite
+
+### Prevention Checklist
+
+Before writing any frontend test:
+- [ ] Read the actual component implementation file
+- [ ] Identify real testids and element structure  
+- [ ] Check TypeScript interfaces for data shapes
+- [ ] Verify conditional rendering logic
+- [ ] Confirm text content and formatting expectations
+- [ ] Use specific selectors to avoid element conflicts
+
+**This rule eliminates the "assumption → test → fail → fix" cycle entirely.**
+
+

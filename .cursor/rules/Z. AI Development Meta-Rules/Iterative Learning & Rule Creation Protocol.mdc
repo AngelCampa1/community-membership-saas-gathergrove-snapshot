@@ -1,0 +1,117 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+## Iterative Learning & Rule Creation Protocol
+
+### Purpose
+Capture development learnings and patterns to accelerate future development and overcome AI context limitations.
+
+### When to Create New Rules
+
+**MANDATORY: Add a new rule when ANY of these conditions are met:**
+
+1. **Issue Recurrence** - The same type of issue appears 2+ times in a session
+2. **Time Investment** - Any single issue takes >30 minutes to resolve
+3. **Pattern Discovery** - A successful solution pattern emerges that could be reused
+4. **Context Limitation Impact** - Important knowledge that won't persist across sessions
+5. **User Feedback** - User explicitly requests documentation of learnings
+
+### Rule Creation Process
+
+**IMMEDIATE ACTION REQUIRED:**
+1. **Stop current work** when criteria are met
+2. **Identify the pattern/learning** clearly
+3. **Create new rule** in appropriate category
+4. **Document specific examples** and solutions
+5. **Update rule numbering** if needed
+6. **Continue development** with new rule applied
+
+### Rule Content Requirements
+
+Each new rule MUST include:
+- **Problem Pattern**: What issue this solves
+- **Solution Pattern**: Specific approach/code/technique
+- **Examples**: Real scenarios where this applies
+- **Prevention**: How to avoid the issue entirely
+- **Tools/Commands**: Exact commands or code snippets
+
+### Rule Categories for Development Learnings
+
+- **Testing Patterns** (E2E, Unit, Integration)
+- **Implementation Patterns** (Form handling, Navigation, Validation)
+- **Debugging Protocols** (Error analysis, Context reading)
+- **Performance Optimizations**
+- **Architecture Decisions**
+- **Tool Configurations**
+
+### Meta-Learning Principle
+
+**"Every problem solved is a pattern to be codified"**
+
+This ensures:
+- ✅ Faster time to market on future projects
+- ✅ Consistent solution quality
+- ✅ Knowledge persistence across AI context limitations
+- ✅ Team knowledge sharing
+- ✅ Reduced debugging time
+
+### Example Rule Creation
+
+```
+## XX. [Pattern Name] - [One Line Description]
+
+### Problem Pattern
+[What recurring issue this solves]
+
+### Solution Pattern  
+[Specific approach/technique]
+
+### Implementation
+[Exact code/commands/steps]
+
+### Examples
+[Real scenarios from current project]
+
+### Prevention
+[How to avoid the issue entirely]
+```
+
+**This rule supersedes ad-hoc problem solving - learnings MUST be captured immediately.**
+
+### MANDATORY: Rule Creation Location Protocol
+
+**CRITICAL META RULE: ALL RULES MUST BE PLACED IN `.cursor/rules/` DIRECTORY**
+
+#### Rule Organization Structure:
+- **A. Core Principles & Specification Adherence** - Fundamental project rules
+- **B. Backend Development** - .NET, EF Core, database patterns  
+- **C. Frontend Development** - Next.js, TypeScript, UI patterns
+- **D. Code Quality, Testing & Project Standards** - Testing methodology, code quality
+- **E. User Feedback & Application Logging** - Logging and user experience
+- **F. API & Documentation Standards** - API design and documentation
+- **G. Misc Rules** - Platform-specific and miscellaneous patterns
+- **Z. AI Development Meta-Rules** - Rules about rules and AI development
+
+#### NEVER Place Rules In:
+- ❌ `/docs/status/` files - These are for implementation status tracking only
+- ❌ `/docs/user-stories/` files - These are for user story specifications only
+- ❌ README files - These are for project documentation
+- ❌ Code comments - Rules are cross-cutting concerns
+- ❌ Random documentation files - Rules need centralized location
+
+#### When Adding New Rules:
+1. **Identify correct category** from A-Z structure above
+2. **Create appropriately named .mdc file** in correct directory
+3. **Follow established rule format** (Problem → Solution → Examples → Prevention)
+4. **Reference rule location** in conversations, not the content itself
+
+#### Rule Naming Convention:
+- Use descriptive names that indicate the problem solved
+- Include context (e.g., "E2E Testing", "Form Validation", "API Design")
+- Use .mdc extension for markdown files
+
+**VIOLATION: Adding rules to wrong locations wastes time and creates confusion.**
+
+

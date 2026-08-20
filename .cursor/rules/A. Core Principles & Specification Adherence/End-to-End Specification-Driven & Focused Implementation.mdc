@@ -1,0 +1,12 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+The individual user story files in `/docs/user-stories/` contain the detailed user stories and are your primary source of truth for all feature requirements. All implementation MUST be derived directly from the user stories defined in these files and MUST encompass all necessary backend and frontend code to make the feature described in the user story fully functional from an end-user perspective, unless the user story explicitly scopes the work to a single tier (e.g., "Backend Only: Refactor X" or "Frontend Only: Redesign Y").
+
+**PREREQUISITE: You MUST have already read `/docs/status/implementation-overview.md` and the specific story's status file (per Rule 0) to understand what already exists before implementing the user story.**
+
+Focus only on the entities, attributes, API endpoints, UI/UX descriptions, and logic explicitly mentioned in the current user story from the backlog file. When creating an entity or UI component for the first time, the current user story's definition is absolute. When modifying existing elements, clearly address how the existing structure needs to change based on the current story.
+
+Don't forget to always create meaningful backend and frontend tests, this is required to consider a user story implemented. Do not come back to me until feature is fully implemented, tests are added and all tests pass.

@@ -1,0 +1,6 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+The "User Journey," "API Endpoint," and "Database Interaction" sections of any user story are direct implementation instructions. Follow them precisely. If a story states "The system must...", it is a non-negotiable requirement.

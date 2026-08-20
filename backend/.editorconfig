@@ -1,0 +1,10 @@
+root = true
+
+[*.cs]
+# Suppress analyzers that cannot be auto-fixed by dotnet format
+# ASP0019: Use IHeaderDictionary.Append instead of IDictionary.Add (pre-existing in codebase)
+dotnet_diagnostic.ASP0019.severity = none
+# CA1416: Platform-specific API calls (Windows-only code is intentional on this platform)
+dotnet_diagnostic.CA1416.severity = none
+# NUnit2007: Constant actual value (pre-existing in tests, not auto-fixable)
+dotnet_diagnostic.NUnit2007.severity = none

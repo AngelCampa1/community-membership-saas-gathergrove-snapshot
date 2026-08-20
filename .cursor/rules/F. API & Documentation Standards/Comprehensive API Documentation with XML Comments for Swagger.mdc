@@ -1,0 +1,48 @@
+---
+description: After creating an API endpoint
+globs: 
+alwaysApply: false
+---
+All public API endpoints in the .NET controllers MUST be fully documented using XML comments to generate a rich and accurate Swagger/OpenAPI specification. This documentation is non-negotiable and serves as the primary contract for frontend developers and API consumers.
+
+The documentation for each controller action MUST include:
+
+<summary>: A concise, one-line description of what the endpoint does.
+<remarks>: A more detailed section for notes, business logic, and required permissions. You MUST specify the required user role (e.g., "Requires 'Admin' role and club ownership.").
+<param>: A description for every parameter in the URL path (e.g., clubId, memberId).
+<response>: A dedicated response tag for EVERY possible HTTP status code the endpoint can return. This MUST include, at a minimum:
+Success Codes (200, 201, 204): Describe the successful outcome.
+400 Bad Request: Explain what causes a validation failure (e.g., "If the request body fails validation due to missing or invalid fields.").
+401 Unauthorized: "If the request lacks a valid JWT."
+403 Forbidden: "If the authenticated user does not have permission to perform the action (e.g., not an admin, or attempting to access another club's data)."
+404 Not Found: "If a specific resource (e.g., the member specified by memberId) does not exist."
+409 Conflict: If applicable, for business rule violations (e.g., "If attempting to register with an email that already exists.").
+Additionally, all properties on Request and Response DTOs (e.g., CreateMemberRequest) MUST have a <summary> tag explaining the field and providing an example.
+
+Example Implementation (POST /api/v1/clubs/{clubId}/members):
+
+C#
+
+/// <summary>
+/// Creates a new member for a specific club.
+/// </summary>
+/// <remarks>
+/// Creates a new member record and adds them to the club.
+/// Requires 'Admin' role and ownership of the specified club.
+/// The member's JoinDate is set to the current date and their status defaults to 'Active'.
+/// </remarks>
+/// <param name="clubId">The ID of the club where the member will be added.</param>
+/// <param name="request">The details of the new member to create.</param>
+/// <response code="201">Returns the newly created member's details.</response>
+/// <response code="400">If the request body fails validation (e.g., missing name or invalid email).</response>
+/// <response code="401">If the request lacks a valid JWT.</response>
+/// <response code="403">If the user is not an admin for the specified club.</response>
+/// <response code="404">If the specified club does not exist.</response>
+[HttpPost]
+[ProducesResponseType(typeof(MemberResponse), 201)]
+[ProducesResponseType(typeof(ValidationProblemDetails), 400)]
+public async Task<IActionResult> CreateMember([FromRoute] int clubId, [FromBody] CreateMemberRequest request)
+{
+    // ... implementation
+
+}

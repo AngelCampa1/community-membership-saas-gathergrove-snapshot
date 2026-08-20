@@ -1,0 +1,111 @@
+---
+description: 
+globs: *.cs
+alwaysApply: false
+---
+## Database Migration Protocol - Automatic Migration Detection & Execution
+
+### Problem Pattern
+Backend changes fail in testing/production because:
+- Database schema changes aren't applied via migrations
+- New entities or properties are added but database isn't updated
+- Tests fail with "table doesn't exist" or "column doesn't exist" errors
+- Application fails to start due to EF Core model/database mismatch
+
+### Solution Pattern
+**MANDATORY: Check for and run database migrations after any backend entity/schema changes**
+
+### Implementation
+
+**Before running any backend tests or starting the application, ALWAYS:**
+
+1. **Check if migrations are needed** after backend changes
+2. **Generate migrations** for any new entities or property changes
+3. **Apply migrations** to update the database schema
+4. **Verify migration success** before proceeding
+
+### Migration Detection Triggers
+
+**ALWAYS run migration check when:**
+- New Entity classes are added to Domain/Entities
+- New properties added to existing entities
+- Entity relationships are modified (foreign keys, navigation properties)
+- DbSet entries are added to GatherGroveDbContext
+- Fluent API configurations are modified in OnModelCreating
+- Database constraints or indexes are changed
+
+### Migration Commands
+
+```bash
+# 1. Navigate to backend directory
+cd backend
+
+# 2. Check current migration status
+dotnet ef migrations list
+
+# 3. Generate new migration (if schema changes detected)
+dotnet ef migrations add [MigrationName] --project src/GatherGrove.Infrastructure --startup-project src/GatherGrove.API
+
+# 4. Apply migrations to update database
+dotnet ef database update --project src/GatherGrove.Infrastructure --startup-project src/GatherGrove.API
+
+# 5. Verify migration applied successfully
+dotnet ef migrations list
+```
+
+### Migration Naming Convention
+- **Entity Addition**: `Add[EntityName]Entity` (e.g., `AddPasswordResetTokenEntity`)
+- **Property Addition**: `Add[PropertyName]To[EntityName]` (e.g., `AddClubTierToClub`)
+- **Relationship Changes**: `Update[EntityName]Relationships` (e.g., `UpdateUserClubRelationships`)
+- **Index/Constraint**: `Add[IndexName]Index` or `Add[ConstraintName]Constraint`
+
+### Examples from Current Project
+
+**When PasswordResetToken entity was added:**
+```bash
+cd backend
+dotnet ef migrations add AddPasswordResetTokenEntity --project src/GatherGrove.Infrastructure --startup-project src/GatherGrove.API
+dotnet ef database update --project src/GatherGrove.Infrastructure --startup-project src/GatherGrove.API
+```
+
+**When ClubTier property was added to UserSessionResponse:**
+```bash
+# Check if Club entity needs ClubTier property
+cd backend
+dotnet ef migrations add AddClubTierToClub --project src/GatherGrove.Infrastructure --startup-project src/GatherGrove.API
+dotnet ef database update --project src/GatherGrove.Infrastructure --startup-project src/GatherGrove.API
+```
+
+### Verification Steps
+
+**After running migrations, VERIFY:**
+1. `dotnet ef migrations list` shows new migration applied
+2. Backend tests pass without "table/column doesn't exist" errors
+3. Application starts without EF Core model/database mismatch errors
+4. API endpoints return data correctly
+
+### Prevention
+- **Check migration status** before every backend test run
+- **Generate migrations immediately** after entity/schema changes
+- **Never ignore EF Core warnings** about model/database differences
+- **Run migrations in correct order** - Infrastructure project with API startup project
+
+### Integration with Development Workflow
+
+**Before running backend tests:**
+```bash
+cd backend
+dotnet ef database update --project src/GatherGrove.Infrastructure --startup-project src/GatherGrove.API
+dotnet test
+```
+
+**Before running E2E tests:**
+```bash
+cd backend
+dotnet ef database update --project src/GatherGrove.Infrastructure --startup-project src/GatherGrove.API
+cd ../e2e
+npx playwright test
+```
+
+**This protocol prevents 90% of database-related test failures and deployment issues.**
+

@@ -1,0 +1,80 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "name": "GatherGrove Shadow Tokens",
+  "description": "Abstract shadow descriptors. CSS platform renders as box-shadow strings; mobile platform renders as React Native shadow objects.",
+
+  "shadow": {
+    "none": {
+      "value": { "offsetX": 0, "offsetY": 0, "blur": 0, "spread": 0, "color": "transparent", "opacity": 0, "elevation": 0 },
+      "type": "shadow",
+      "css": "0 0 #0000",
+      "description": "No shadow"
+    },
+    "xs": {
+      "value": { "offsetX": 0, "offsetY": 1, "blur": 2, "spread": 0, "color": "#19241e", "opacity": 0.05, "elevation": 1 },
+      "type": "shadow",
+      "css": "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+      "description": "Extra-small shadow for subtle elevation"
+    },
+    "sm": {
+      "value": { "offsetX": 0, "offsetY": 1, "blur": 3, "spread": 0, "color": "#19241e", "opacity": 0.1, "elevation": 2 },
+      "type": "shadow",
+      "css": "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)",
+      "description": "Small shadow for cards and dropdowns"
+    },
+    "md": {
+      "value": { "offsetX": 0, "offsetY": 4, "blur": 6, "spread": 0, "color": "#19241e", "opacity": 0.15, "elevation": 4 },
+      "type": "shadow",
+      "css": "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)",
+      "description": "Medium shadow for modals and overlays"
+    },
+    "lg": {
+      "value": { "offsetX": 0, "offsetY": 10, "blur": 15, "spread": 0, "color": "#19241e", "opacity": 0.15, "elevation": 8 },
+      "type": "shadow",
+      "css": "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)",
+      "description": "Large shadow for floating elements"
+    },
+    "xl": {
+      "value": { "offsetX": 0, "offsetY": 20, "blur": 25, "spread": 0, "color": "#19241e", "opacity": 0.25, "elevation": 12 },
+      "type": "shadow",
+      "css": "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
+      "description": "Extra-large shadow for sheets"
+    },
+    "2xl": {
+      "value": { "offsetX": 0, "offsetY": 25, "blur": 50, "spread": 0, "color": "#19241e", "opacity": 0.25, "elevation": 16 },
+      "type": "shadow",
+      "css": "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+      "description": "2XL shadow for dialogs"
+    },
+    "inner": {
+      "value": { "offsetX": 0, "offsetY": 2, "blur": 4, "spread": 0, "color": "#19241e", "opacity": 0.05, "elevation": 0 },
+      "type": "shadow",
+      "css": "inset 0 2px 4px 0 rgba(0, 0, 0, 0.05)",
+      "description": "Inset shadow for pressed states"
+    },
+    "soft": {
+      "value": { "offsetX": 0, "offsetY": 2, "blur": 16, "spread": 0, "color": "#19241e", "opacity": 0.08, "elevation": 2 },
+      "type": "shadow",
+      "css": "0 2px 16px -4px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.02)",
+      "description": "Soft branded shadow"
+    },
+    "medium": {
+      "value": { "offsetX": 0, "offsetY": 4, "blur": 24, "spread": 0, "color": "#19241e", "opacity": 0.12, "elevation": 4 },
+      "type": "shadow",
+      "css": "0 4px 24px -8px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04)",
+      "description": "Medium branded shadow"
+    },
+    "strong": {
+      "value": { "offsetX": 0, "offsetY": 8, "blur": 32, "spread": 0, "color": "#19241e", "opacity": 0.16, "elevation": 8 },
+      "type": "shadow",
+      "css": "0 8px 32px -12px rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.06)",
+      "description": "Strong branded shadow"
+    },
+    "colored": {
+      "value": { "offsetX": 0, "offsetY": 8, "blur": 32, "spread": 0, "color": "#4a9a72", "opacity": 0.2, "elevation": 6 },
+      "type": "shadow",
+      "css": "0 8px 32px -8px rgba(74, 154, 114, 0.2)",
+      "description": "Brand-colored glow shadow"
+    }
+  }
+}

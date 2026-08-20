@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="none">
+  <!-- Trunk — teal rectangle -->
+  <rect x="118" y="174" width="20" height="54" rx="7" fill="#3d9479"/>
+  <!-- Trunk root spreads -->
+  <path d="M118 214 Q94 224 76 234" stroke="#3d9479" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M138 214 Q162 224 180 234" stroke="#3d9479" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <!-- Crown: 7 dots arranged in rounded tree shape — people gathering -->
+  <!-- Top center -->
+  <circle cx="128" cy="70" r="17" fill="#3d9479"/>
+  <!-- Second row -->
+  <circle cx="93" cy="103" r="16" fill="#3d9479"/>
+  <circle cx="163" cy="103" r="16" fill="#3d9479"/>
+  <!-- Third row (lighter teal inner) -->
+  <circle cx="68" cy="142" r="15" fill="#67b99a"/>
+  <circle cx="128" cy="146" r="15" fill="#67b99a"/>
+  <circle cx="188" cy="142" r="15" fill="#67b99a"/>
+  <!-- Grounding dot at trunk join -->
+  <circle cx="128" cy="177" r="9" fill="#3d9479" opacity="0.35"/>
+</svg>

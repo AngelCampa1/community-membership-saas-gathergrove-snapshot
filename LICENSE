@@ -1,0 +1,47 @@
+GatherGrove Source-Available License
+Copyright (c) 2025-2026 Angel Campa. All rights reserved.
+
+This source code is published for the purpose of demonstrating the author's
+engineering work. It is source-available, NOT open source. The Open Source
+Initiative would not approve this license, and that is intentional.
+
+WHAT YOU MAY DO
+
+  1. View, read, and study this source code.
+  2. Clone or download the repository for personal evaluation of the author's
+     work, for example as part of reviewing a job application.
+  3. Quote short excerpts with attribution, for commentary, review, teaching,
+     or discussion.
+  4. Run the code locally for the sole purpose of evaluating it.
+
+WHAT YOU MAY NOT DO
+
+  1. Use this software, in whole or in part, for any commercial purpose.
+  2. Redistribute, republish, sublicense, sell, or host this software or any
+     derivative of it, whether modified or unmodified.
+  3. Operate this software as a service, internally or publicly.
+  4. Incorporate any substantial portion of this code into another project.
+  5. Remove or alter this license or the copyright notices.
+
+The name "GatherGrove", the GatherGrove logo, and all associated brand assets
+in this repository are excluded from any permission granted above and remain
+the exclusive property of the copyright holder.
+
+For any use beyond the permissions above, contact the copyright holder for
+written permission.
+
+NO WARRANTY
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHOR OR COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM,
+OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+THIRD-PARTY COMPONENTS
+
+This project depends on third-party open-source packages, each governed by its
+own license. Those licenses are not superseded by this one. See the dependency
+manifests (package.json, *.csproj) for the full list.

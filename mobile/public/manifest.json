@@ -1,0 +1,259 @@
+{
+  "name": "GatherGrove Mobile",
+  "short_name": "GatherGrove",
+  "description": "Community management and engagement platform for organizations, clubs, and societies.",
+  "version": "1.0.0",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#667eea",
+  "background_color": "#ffffff",
+  "categories": ["social", "productivity", "lifestyle"],
+  "lang": "en-US",
+  "dir": "ltr",
+  
+  "icons": [
+    {
+      "src": "/assets/images/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/images/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/images/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/images/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/images/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/images/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/images/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/images/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  
+  "screenshots": [
+    {
+      "src": "/assets/screenshots/desktop-home.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "GatherGrove Dashboard"
+    },
+    {
+      "src": "/assets/screenshots/mobile-home.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Mobile Dashboard"
+    },
+    {
+      "src": "/assets/screenshots/mobile-events.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Events Calendar"
+    },
+    {
+      "src": "/assets/screenshots/mobile-directory.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Member Directory"
+    }
+  ],
+
+  "shortcuts": [
+    {
+      "name": "Events",
+      "short_name": "Events",
+      "description": "View upcoming community events",
+      "url": "/events",
+      "icons": [
+        {
+          "src": "/assets/icons/calendar-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Directory",
+      "short_name": "Directory",
+      "description": "Browse member directory",
+      "url": "/directory",
+      "icons": [
+        {
+          "src": "/assets/icons/people-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Pay Dues",
+      "short_name": "Pay Dues",
+      "description": "Pay membership dues",
+      "url": "/pay-dues",
+      "icons": [
+        {
+          "src": "/assets/icons/payment-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Chat",
+      "short_name": "Chat",
+      "description": "Community chat and messaging",
+      "url": "/chat",
+      "icons": [
+        {
+          "src": "/assets/icons/chat-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "files",
+          "accept": ["image/*", "text/plain", "application/pdf"]
+        }
+      ]
+    }
+  },
+
+  "protocol_handlers": [
+    {
+      "protocol": "web+gathergrove",
+      "url": "/handle-protocol?type=%s"
+    }
+  ],
+
+  "file_handlers": [
+    {
+      "action": "/open-file",
+      "accept": {
+        "text/plain": [".txt", ".md"],
+        "image/*": [".png", ".jpg", ".jpeg", ".gif"],
+        "application/pdf": [".pdf"]
+      }
+    }
+  ],
+
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+
+  "launch_handler": {
+    "client_mode": ["navigate-existing", "auto"]
+  },
+
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.gathergrove.mobile",
+      "id": "com.gathergrove.mobile"
+    },
+    {
+      "platform": "ios",
+      "url": "https://apps.apple.com/app/gathergrove/id123456789"
+    }
+  ],
+
+  "prefer_related_applications": false,
+
+  "permissions": [
+    "notifications",
+    "persistent-storage",
+    "camera",
+    "microphone",
+    "geolocation"
+  ],
+
+  "features": [
+    {
+      "name": "offline-support",
+      "description": "Full offline functionality with data synchronization"
+    },
+    {
+      "name": "push-notifications",
+      "description": "Real-time notifications for events and messages"
+    },
+    {
+      "name": "background-sync",
+      "description": "Automatic data synchronization when connection is restored"
+    },
+    {
+      "name": "responsive-design",
+      "description": "Optimized for all screen sizes and orientations"
+    },
+    {
+      "name": "secure-payments",
+      "description": "Secure payment processing for membership dues"
+    }
+  ],
+
+  "custom": {
+    "gathergrove": {
+      "api_version": "v1",
+      "supported_features": [
+        "offline_mode",
+        "push_notifications",
+        "background_sync",
+        "biometric_auth",
+        "secure_storage"
+      ],
+      "minimum_os_versions": {
+        "android": "7.0",
+        "ios": "12.0",
+        "windows": "10",
+        "mac": "10.14"
+      }
+    }
+  }
+}

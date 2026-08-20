@@ -1,0 +1,127 @@
+version: '3.8'
+
+# GatherGrove E2E Testing Docker Compose Configuration
+# Default configuration for development environment
+# Author: HIVE MIND Coder Delta
+
+services:
+  # Frontend React Application
+  gathergrove-web:
+    build:
+      context: ../../../client
+      dockerfile: Dockerfile
+      target: development
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - REACT_APP_API_URL=http://localhost:5000
+      - REACT_APP_WS_URL=ws://localhost:5000
+      - FAST_REFRESH=true
+      - CHOKIDAR_USEPOLLING=true
+    volumes:
+      - ../../../client:/app
+      - /app/node_modules
+    depends_on:
+      - gathergrove-api
+    networks:
+      - gathergrove-test
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Backend ASP.NET Core API
+  gathergrove-api:
+    build:
+      context: ../../../backend
+      dockerfile: Dockerfile
+      target: development
+    ports:
+      - "5000:5000"
+      - "5001:5001"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000;https://+:5001
+      - ConnectionStrings__DefaultConnection=Server=db,1433;Database=GatherGroveTest;User Id=sa;Password=TestPassword123!;TrustServerCertificate=True;
+      - ConnectionStrings__RedisConnection=redis:6379
+      - Jwt__SecretKey=GatherGroveTestSecretKey2024ForE2ETesting!
+      - Jwt__Issuer=GatherGrove
+      - Jwt__Audience=GatherGrove
+    depends_on:
+      - db
+      - redis
+    networks:
+      - gathergrove-test
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # SQL Server Database
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=TestPassword123!
+      - MSSQL_DATABASE=GatherGroveTest
+    ports:
+      - "1433:1433"
+    volumes:
+      - db_data:/var/opt/mssql
+    networks:
+      - gathergrove-test
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P TestPassword123! -Q 'SELECT 1'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - gathergrove-test
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Database Seeder (runs once)
+  db-seeder:
+    build:
+      context: ../../../backend
+      dockerfile: Dockerfile.seeder
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=db,1433;Database=GatherGroveTest;User Id=sa;Password=TestPassword123!;TrustServerCertificate=True;
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - gathergrove-test
+    profiles:
+      - seeding
+
+networks:
+  gathergrove-test:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  db_data:
+    driver: local
+  redis_data:
+    driver: local

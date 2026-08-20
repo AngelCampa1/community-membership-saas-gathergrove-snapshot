@@ -1,0 +1,306 @@
+version: '3.8'
+
+# GatherGrove E2E Testing Docker Compose Configuration - Production Test Environment
+# Production-like configuration with load balancing and monitoring
+# Author: HIVE MIND Coder Delta
+
+services:
+  # Nginx Load Balancer
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - gathergrove-web-1
+      - gathergrove-web-2
+      - gathergrove-api-1
+      - gathergrove-api-2
+    networks:
+      - gathergrove-prod-test
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Frontend React Application - Instance 1
+  gathergrove-web-1:
+    build:
+      context: ../../../client
+      dockerfile: Dockerfile
+      target: production
+    environment:
+      - NODE_ENV=production
+      - REACT_APP_API_URL=http://localhost/api
+      - REACT_APP_WS_URL=ws://localhost/ws
+      - REACT_APP_ENVIRONMENT=production-test
+    depends_on:
+      - gathergrove-api-1
+    networks:
+      - gathergrove-prod-test
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Frontend React Application - Instance 2
+  gathergrove-web-2:
+    build:
+      context: ../../../client
+      dockerfile: Dockerfile
+      target: production
+    environment:
+      - NODE_ENV=production
+      - REACT_APP_API_URL=http://localhost/api
+      - REACT_APP_WS_URL=ws://localhost/ws
+      - REACT_APP_ENVIRONMENT=production-test
+    depends_on:
+      - gathergrove-api-2
+    networks:
+      - gathergrove-prod-test
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Backend ASP.NET Core API - Instance 1
+  gathergrove-api-1:
+    build:
+      context: ../../../backend
+      dockerfile: Dockerfile
+      target: production
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__DefaultConnection=Server=db-primary,1433;Database=GatherGroveProdTest;User Id=sa;Password=ProdTestPassword123!;TrustServerCertificate=True;
+      - ConnectionStrings__RedisConnection=redis-primary:6379
+      - Jwt__SecretKey=GatherGroveProdTestSecretKey2024ForE2ETesting!
+      - Jwt__Issuer=GatherGroveProdTest
+      - Jwt__Audience=GatherGroveProdTest
+      - Logging__LogLevel__Default=Warning
+      - Logging__LogLevel__Microsoft.AspNetCore=Error
+    depends_on:
+      - db-primary
+      - redis-primary
+    networks:
+      - gathergrove-prod-test
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 1G
+        reservations:
+          cpus: '1.0'
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Backend ASP.NET Core API - Instance 2
+  gathergrove-api-2:
+    build:
+      context: ../../../backend
+      dockerfile: Dockerfile
+      target: production
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__DefaultConnection=Server=db-primary,1433;Database=GatherGroveProdTest;User Id=sa;Password=ProdTestPassword123!;TrustServerCertificate=True;
+      - ConnectionStrings__RedisConnection=redis-primary:6379
+      - Jwt__SecretKey=GatherGroveProdTestSecretKey2024ForE2ETesting!
+      - Jwt__Issuer=GatherGroveProdTest
+      - Jwt__Audience=GatherGroveProdTest
+      - Logging__LogLevel__Default=Warning
+      - Logging__LogLevel__Microsoft.AspNetCore=Error
+    depends_on:
+      - db-primary
+      - redis-primary
+    networks:
+      - gathergrove-prod-test
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 1G
+        reservations:
+          cpus: '1.0'
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Primary SQL Server Database
+  db-primary:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=ProdTestPassword123!
+      - MSSQL_DATABASE=GatherGroveProdTest
+    ports:
+      - "1435:1433"
+    volumes:
+      - db_prod_data:/var/opt/mssql
+    networks:
+      - gathergrove-prod-test
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 4G
+        reservations:
+          cpus: '2.0'
+          memory: 2G
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ProdTestPassword123! -Q 'SELECT 1'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # Primary Redis Cache
+  redis-primary:
+    image: redis:7-alpine
+    ports:
+      - "6381:6379"
+    volumes:
+      - redis_prod_data:/data
+    command: redis-server --appendonly yes --maxmemory 1gb --maxmemory-policy allkeys-lru
+    networks:
+      - gathergrove-prod-test
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Database Seeder - Production Test
+  db-seeder:
+    build:
+      context: ../../../backend
+      dockerfile: Dockerfile.seeder
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=db-primary,1433;Database=GatherGroveProdTest;User Id=sa;Password=ProdTestPassword123!;TrustServerCertificate=True;
+      - ASPNETCORE_ENVIRONMENT=Production
+      - DATA_SEED_MODE=production-test
+    depends_on:
+      db-primary:
+        condition: service_healthy
+    networks:
+      - gathergrove-prod-test
+    profiles:
+      - seeding
+
+  # Prometheus Monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks:
+      - gathergrove-prod-test
+    profiles:
+      - monitoring
+
+  # Grafana Dashboards
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3002:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    networks:
+      - gathergrove-prod-test
+    profiles:
+      - monitoring
+
+  # Load Testing with K6
+  load-tester:
+    image: loadimpact/k6:latest
+    volumes:
+      - ../scripts/load-tests:/scripts
+    depends_on:
+      - nginx
+    networks:
+      - gathergrove-prod-test
+    profiles:
+      - load-testing
+
+  # Performance Monitoring
+  lighthouse:
+    build:
+      context: ../scripts/lighthouse
+      dockerfile: Dockerfile
+    volumes:
+      - lighthouse_reports:/reports
+    depends_on:
+      - nginx
+    networks:
+      - gathergrove-prod-test
+    profiles:
+      - performance-testing
+
+networks:
+  gathergrove-prod-test:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.22.0.0/16
+
+volumes:
+  db_prod_data:
+    driver: local
+  redis_prod_data:
+    driver: local
+  grafana_data:
+    driver: local
+  lighthouse_reports:
+    driver: local

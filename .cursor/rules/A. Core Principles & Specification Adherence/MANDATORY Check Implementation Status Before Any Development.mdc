@@ -1,0 +1,71 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+**MANDATORY RULE: Before implementing ANY user story, feature, or making code changes, you MUST:**
+
+1. **READ `/docs/status/implementation-overview.md` FIRST** - This document contains the complete current state of the repository
+2. **READ the specific user story from `/docs/user-stories/`** - This contains detailed requirements for the feature you're implementing
+3. **READ the story's status file from `/docs/status/`** - Check what has already been implemented for this specific story
+4. **Review current repository structure** - Understand available components, services, and patterns
+5. **Understand existing API endpoints and services** - Build upon established infrastructure
+6. **Check test coverage and build status** - Ensure you're working with a stable foundation
+
+**MANDATORY RULE: After completing ANY user story implementation, you MUST:**
+
+1. **UPDATE the story's status file in `/docs/status/`** - Document everything that was implemented for this specific story
+2. **UPDATE `/docs/status/implementation-overview.md`** - Update the high-level project status
+3. **Mark the user story as completed** - Update the status and completion date in the story's status file
+4. **Document new repository structure** - Add any new files, components, or services created
+5. **Update database schema section** - Include any new entities or migrations
+6. **Document new API endpoints** - Add endpoints to the story's status file
+7. **Update testing status** - Include new test counts and coverage
+8. **Note any dependencies added** - Document new packages or tools introduced
+9. **Add important notes** - Include any caveats, TODOs, or considerations for future development
+
+**This document prevents:**
+- Duplicate implementations that waste time
+- Breaking existing functionality that already works
+- Inconsistent architecture decisions that create technical debt
+- Missing dependencies or incomplete setup steps
+- Reinventing solutions that already exist
+
+**The `/docs/status/implementation-overview.md` file contains:**
+- ✅ Complete status of all user stories (what's done, what's in progress)
+- 🏗️ Current repository structure with exact file locations
+- 🗄️ Database schema and entity status
+- 🔗 Available API endpoints and their functionality
+- 🎨 UI/UX features already implemented
+- 🧪 Current testing status and coverage
+- 🚀 Available building blocks ready for use
+- 📝 Important notes for future development
+
+**Individual story files in `/docs/user-stories/` contain:**
+- Detailed user story specifications
+- User journey descriptions
+- API endpoint requirements
+- Database interaction specifications
+- UI/UX requirements
+- Acceptance criteria
+
+**Individual status files in `/docs/status/` contain:**
+- Specific implementation details for each story
+- What was built (backend, frontend, database)
+- Testing status for the story
+- Files created/modified
+- Implementation notes and challenges
+
+**Examples of what you'll discover:**
+- Authentication system is complete (login/register) with JWT cookies
+- Theme system is implemented with dark/light mode toggle
+- Shadcn/ui component library is ready for use
+- EF Core database context is configured with User, Club, ClubAdmin entities
+- Testing frameworks are set up for both backend (NUnit/Moq) and frontend (Jest)
+
+**VIOLATION OF THIS RULE leads to:**
+- Wasted development time on features that already exist
+- Breaking changes to working functionality
+- Inconsistent code patterns across the project
+- Missing critical dependencies or setup steps
+

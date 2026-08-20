@@ -1,0 +1,160 @@
+{
+  "environment": "Development",
+  "baseUrl": "http://localhost:8050",
+  "apiTimeout": 30,
+  "maxRetries": 3,
+  "logging": {
+    "enabled": true,
+    "path": "./seed-logs",
+    "verbose": false
+  },
+  "clubs": [
+    {
+      "name": "Sunrise Yoga Club",
+      "tier": "Sprout",
+      "adminEmail": "admin-sunrise-yoga@test.local",
+      "adminPassword": "TestPassword123!",
+      "memberCount": {
+        "min": 10,
+        "max": 15
+      },
+      "locationCount": 1,
+      "features": ["basic-events", "member-management"],
+      "membershipTypes": [
+        { "name": "Individual", "duesAmount": 30.00, "duesFrequency": "Monthly" },
+        { "name": "Student", "duesAmount": 20.00, "duesFrequency": "Monthly" }
+      ],
+      "customFields": [
+        { "name": "Emergency Contact", "type": "Text", "required": true },
+        { "name": "Preferred Class Time", "type": "Select", "options": ["Morning", "Afternoon", "Evening"] }
+      ],
+      "tags": ["New Member", "Regular", "Instructor"],
+      "eventMix": {
+        "past": 8,
+        "upcoming": 12,
+        "freePercentage": 80,
+        "categories": ["Beginner Yoga", "Intermediate Yoga", "Meditation", "Wellness Workshop"]
+      }
+    },
+    {
+      "name": "Downtown Book Club",
+      "tier": "Grow",
+      "adminEmail": "admin-downtown-book@test.local",
+      "adminPassword": "TestPassword123!",
+      "memberCount": {
+        "min": 50,
+        "max": 75
+      },
+      "locationCount": 2,
+      "locations": [
+        { "name": "Main Library", "address": "123 Library St", "city": "Downtown" },
+        { "name": "Community Center", "address": "456 Community Ave", "city": "Midtown" }
+      ],
+      "features": ["multi-location", "chat", "event-series", "qr-checkin"],
+      "membershipTypes": [
+        { "name": "Individual", "duesAmount": 15.00, "duesFrequency": "Monthly" },
+        { "name": "Family", "duesAmount": 25.00, "duesFrequency": "Monthly" },
+        { "name": "Senior", "duesAmount": 10.00, "duesFrequency": "Monthly" }
+      ],
+      "customFields": [
+        { "name": "Favorite Genre", "type": "Select", "options": ["Fiction", "Non-Fiction", "Mystery", "Romance", "Sci-Fi"] },
+        { "name": "Reading Speed", "type": "Select", "options": ["Fast", "Moderate", "Slow"] },
+        { "name": "Preferred Meeting Day", "type": "Select", "options": ["Monday", "Wednesday", "Friday", "Saturday"] }
+      ],
+      "tags": ["Board Member", "Volunteer", "New Member", "Inactive", "Book Reviewer"],
+      "eventMix": {
+        "past": 25,
+        "upcoming": 30,
+        "freePercentage": 60,
+        "categories": ["Fiction Discussion", "Non-Fiction Discussion", "Author Talk", "Writing Workshop", "Coffee & Books"]
+      },
+      "eventSeries": [
+        { "name": "Monthly Classics", "recurrence": "Monthly", "count": 6 },
+        { "name": "Weekly Coffee Chat", "recurrence": "Weekly", "count": 12 }
+      ],
+      "multiSessionEvents": [
+        { "name": "8-Week Writing Workshop", "sessionCount": 8, "price": 80.00 }
+      ]
+    },
+    {
+      "name": "Metro Fitness Network",
+      "tier": "Unlimited",
+      "adminEmail": "admin-metro-fitness@test.local",
+      "adminPassword": "TestPassword123!",
+      "memberCount": {
+        "min": 200,
+        "max": 250
+      },
+      "locationCount": 5,
+      "locations": [
+        { "name": "Downtown Gym", "address": "100 Fitness Blvd", "city": "Downtown" },
+        { "name": "Westside Studio", "address": "200 West Ave", "city": "Westside" },
+        { "name": "Eastside CrossFit", "address": "300 East St", "city": "Eastside" },
+        { "name": "Northside Yoga", "address": "400 North Rd", "city": "Northside" },
+        { "name": "Southside Spin", "address": "500 South Ln", "city": "Southside" }
+      ],
+      "features": ["all"],
+      "membershipTypes": [
+        { "name": "Individual", "duesAmount": 50.00, "duesFrequency": "Monthly" },
+        { "name": "Family", "duesAmount": 90.00, "duesFrequency": "Monthly" },
+        { "name": "Corporate", "duesAmount": 45.00, "duesFrequency": "Monthly" },
+        { "name": "Student", "duesAmount": 35.00, "duesFrequency": "Monthly" },
+        { "name": "Senior", "duesAmount": 40.00, "duesFrequency": "Monthly" },
+        { "name": "VIP", "duesAmount": 100.00, "duesFrequency": "Monthly" }
+      ],
+      "customFields": [
+        { "name": "Fitness Goals", "type": "Text", "required": false },
+        { "name": "Medical Conditions", "type": "Text", "required": false },
+        { "name": "T-Shirt Size", "type": "Select", "options": ["XS", "S", "M", "L", "XL", "XXL"] },
+        { "name": "Emergency Contact", "type": "Text", "required": true },
+        { "name": "Birthday", "type": "Date", "required": false }
+      ],
+      "tags": ["VIP", "Personal Training Client", "Group Class Regular", "New Member", "At Risk", "Referral Source"],
+      "memberSegments": [
+        { "name": "High Engagement", "description": "Attended 10+ events in last 30 days" },
+        { "name": "At Risk", "description": "No attendance in last 60 days" },
+        { "name": "New Members", "description": "Joined in last 30 days" },
+        { "name": "VIP Members", "description": "Has VIP tag or membership" }
+      ],
+      "eventMix": {
+        "past": 100,
+        "upcoming": 80,
+        "freePercentage": 30,
+        "categories": ["Yoga", "Spin Class", "CrossFit", "Personal Training", "Nutrition Workshop", "Bootcamp"]
+      },
+      "eventSeries": [
+        { "name": "Daily Morning Yoga", "recurrence": "Daily", "count": 30 },
+        { "name": "Tuesday Spin", "recurrence": "Weekly", "count": 12 },
+        { "name": "Thursday CrossFit", "recurrence": "Weekly", "count": 12 }
+      ],
+      "multiSessionEvents": [
+        { "name": "6-Week Transformation Program", "sessionCount": 6, "price": 250.00 },
+        { "name": "4-Week Nutrition Bootcamp", "sessionCount": 4, "price": 150.00 }
+      ],
+      "emailTemplates": [
+        { "name": "Welcome Email", "subject": "Welcome to {{clubName}}!", "category": "Onboarding" },
+        { "name": "Event Reminder", "subject": "Reminder: {{eventName}} tomorrow", "category": "Events" },
+        { "name": "Dues Reminder", "subject": "Your membership dues are due", "category": "Billing" },
+        { "name": "Monthly Newsletter", "subject": "{{clubName}} Monthly Update", "category": "Newsletter" }
+      ],
+      "abTestCampaigns": [
+        { "name": "Event Promotion Test", "variantA": "Join us for the event!", "variantB": "Don't miss out!", "testPercentage": 20 }
+      ],
+      "communicationWorkflows": [
+        { "name": "New Member Onboarding", "trigger": "MemberJoin", "steps": 3 },
+        { "name": "Inactive Member Re-engagement", "trigger": "MemberInactivity", "steps": 4 }
+      ]
+    }
+  ],
+  "dataVariety": {
+    "memberStatuses": ["Active", "Inactive"],
+    "rsvpStatuses": ["Confirmed", "Declined"],
+    "attendanceStatuses": ["Present", "Absent"],
+    "paymentMethods": ["Cash", "Check", "Credit Card", "Stripe"]
+  },
+  "performanceOptions": {
+    "parallelRequests": true,
+    "batchSize": 10,
+    "delayBetweenBatchesMs": 100
+  }
+}

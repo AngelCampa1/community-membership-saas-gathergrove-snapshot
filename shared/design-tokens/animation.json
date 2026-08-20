@@ -1,0 +1,25 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "name": "GatherGrove Animation Tokens",
+  "description": "Duration and easing tokens only. CSS keyframes and Framer Motion variants remain in platform-specific files.",
+
+  "animation": {
+    "duration": {
+      "75":    { "value": "75ms",   "type": "duration", "ms": 75,   "description": "Instant micro-feedback" },
+      "100":   { "value": "100ms",  "type": "duration", "ms": 100,  "description": "Fast hover states" },
+      "150":   { "value": "150ms",  "type": "duration", "ms": 150,  "description": "Quick state changes" },
+      "200":   { "value": "200ms",  "type": "duration", "ms": 200,  "description": "Fast micro-interactions" },
+      "300":   { "value": "300ms",  "type": "duration", "ms": 300,  "description": "Default transitions" },
+      "500":   { "value": "500ms",  "type": "duration", "ms": 500,  "description": "Slow page transitions" },
+      "700":   { "value": "700ms",  "type": "duration", "ms": 700,  "description": "Emphasized animations" },
+      "1000":  { "value": "1000ms", "type": "duration", "ms": 1000, "description": "Extra slow / complex animations" }
+    },
+
+    "easing": {
+      "linear":  { "value": "linear",                      "type": "cubicBezier", "description": "No easing" },
+      "in":      { "value": "cubic-bezier(0.4, 0, 1, 1)",  "type": "cubicBezier", "description": "Ease-in — elements leaving screen" },
+      "out":     { "value": "cubic-bezier(0, 0, 0.2, 1)",  "type": "cubicBezier", "description": "Ease-out — elements entering screen" },
+      "inOut":   { "value": "cubic-bezier(0.4, 0, 0.2, 1)","type": "cubicBezier", "description": "Ease-in-out — standard transitions" }
+    }
+  }
+}

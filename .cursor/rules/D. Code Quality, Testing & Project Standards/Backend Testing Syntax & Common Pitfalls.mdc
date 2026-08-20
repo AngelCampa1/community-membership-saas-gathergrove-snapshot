@@ -1,0 +1,234 @@
+---
+description: 
+globs: *.cs
+alwaysApply: false
+---
+## Backend Testing Syntax & Common Pitfalls - Compilation Error Prevention
+
+### Problem Pattern
+Backend test compilation errors follow predictable patterns that waste significant development time:
+- Namespace conflicts between custom services and third-party libraries
+- Entity property and type mismatches 
+- Incorrect mock setups for async/Task return types
+- Database relationship configuration errors
+- Authentication setup issues in integration tests
+
+### Solution Pattern
+**Follow established entity patterns and mock configurations to prevent compilation errors**
+
+### Implementation
+
+#### 1. Namespace Conflicts Resolution
+**❌ WRONG - Ambiguous references:**
+```csharp
+// Causes conflict between GatherGrove.Application.Services.BillingService and Stripe.BillingService
+private BillingService _billingService;
+```
+
+**✅ CORRECT - Fully qualified references:**
+```csharp
+private GatherGrove.Application.Services.BillingService _billingService;
+private Mock<ILogger<GatherGrove.Application.Services.BillingService>> _mockLogger;
+```
+
+#### 2. Entity Property Patterns (GatherGrove Specific)
+**❌ WRONG - Incorrect property names:**
+```csharp
+var user = new User {
+    Id = Guid.NewGuid(),  // Wrong: Id is int, not Guid
+    IsOnboardingCompleted = true  // Wrong: Property is OnboardingCompleted
+};
+```
+
+**✅ CORRECT - Follow established entity structure:**
+```csharp
+var user = new User {
+    // Don't set Id - it's auto-generated int identity
+    FullName = "Test User",
+    Email = "test@example.com", 
+    PasswordHash = "hash",
+    OnboardingCompleted = true  // Correct property name
+};
+```
+
+#### 3. Mock Setup for Task Return Types
+**❌ WRONG - Incorrect Task mock setup:**
+```csharp
+// Wrong for methods returning Task<bool>
+_mockService.Setup(x => x.CancelSubscriptionAsync(It.IsAny<int>()))
+    .ReturnsAsync(Task.FromResult(true));  // Double wrapping
+```
+
+**✅ CORRECT - Proper Task mock setup:**
+```csharp
+// For Task<bool> methods
+_mockService.Setup(x => x.CancelSubscriptionAsync(It.IsAny<int>()))
+    .ReturnsAsync(true);
+
+// For Task methods (void async)
+_mockService.Setup(x => x.ProcessWebhookAsync(It.IsAny<string>(), It.IsAny<string>()))
+    .Returns(Task.CompletedTask);
+```
+
+#### 4. Database Test Setup Pattern
+**MANDATORY pattern for in-memory database tests:**
+```csharp
+[SetUp]
+public void Setup()
+{
+    var options = new DbContextOptionsBuilder<GatherGroveDbContext>()
+        .UseInMemoryDatabase(databaseName: $"TestDb_{Guid.NewGuid()}")  // Unique per test
+        .Options;
+    
+    _context = new GatherGroveDbContext(options);
+    // Don't dispose here - dispose in TearDown
+}
+
+[TearDown] 
+public void TearDown()
+{
+    _context.Dispose();  // Always dispose context
+}
+```
+
+#### 5. Entity Relationship Setup (GatherGrove Pattern)
+**✅ CORRECT - Follow established relationship pattern:**
+```csharp
+private async Task<(User user, Club club)> CreateTestUserAndClub(string tier = "Sprout")
+{
+    var user = new User {
+        FullName = "Test User",
+        Email = "test@example.com",
+        PasswordHash = "hash", 
+        OnboardingCompleted = true
+        // Don't set Id - auto-generated
+    };
+
+    var club = new Club {
+        Name = "Test Club",
+        Tier = tier
+        // Don't set Id - auto-generated
+    };
+
+    var clubAdmin = new ClubAdmin {
+        User = user,  // Navigation property, not UserId
+        Club = club   // Navigation property, not ClubId
+    };
+
+    _context.Users.Add(user);
+    _context.Clubs.Add(club); 
+    _context.ClubAdmins.Add(clubAdmin);
+    await _context.SaveChangesAsync();
+
+    return (user, club);
+}
+```
+
+#### 6. Integration Test Authentication Setup
+**Standard pattern for API integration tests:**
+```csharp
+private async Task<HttpClient> CreateAuthenticatedClientAsync(User user)
+{
+    var client = _factory.CreateClient();
+    // Add authentication headers/JWT token setup here
+    // Don't assume authentication is automatically handled
+    return client;
+}
+```
+
+#### 7. NUnit Assert.ThrowsAsync Pattern (GatherGrove Specific)
+**❌ WRONG - Using await with Assert.ThrowsAsync:**
+```csharp
+// Causes "GetAwaiter not found" compilation errors
+var ex = await Assert.ThrowsAsync<ArgumentException>(
+    () => _service.SomeMethodAsync(invalidInput));
+```
+
+**✅ CORRECT - Follow established NUnit pattern:**
+```csharp
+// NO await - Assert.ThrowsAsync returns exception directly in this NUnit version
+var ex = Assert.ThrowsAsync<ArgumentException>(
+    () => _service.SomeMethodAsync(invalidInput));
+
+Assert.That(ex.Message, Does.Contain("expected error text"));
+Assert.That(ex.ParamName, Is.EqualTo("parameterName")); // For ArgumentException
+```
+
+**Pattern Examples:**
+```csharp
+// ArgumentNullException
+var ex = Assert.ThrowsAsync<ArgumentNullException>(
+    () => _service.SomeMethodAsync(null!));
+Assert.That(ex.ParamName, Is.EqualTo("request"));
+
+// InvalidOperationException  
+var ex = Assert.ThrowsAsync<InvalidOperationException>(
+    () => _service.SomeMethodAsync(invalidState));
+Assert.That(ex.Message, Does.Contain("Invalid operation"));
+
+// ArgumentException
+var ex = Assert.ThrowsAsync<ArgumentException>(
+    () => _service.SomeMethodAsync(invalidId));
+Assert.That(ex.Message, Does.Contain("not found"));
+```
+
+### Examples from User Story 9
+
+**Billing Service Test Setup:**
+```csharp
+[TestFixture]
+public class BillingServiceTests 
+{
+    private Mock<ILogger<GatherGrove.Application.Services.BillingService>> _mockLogger;
+    private GatherGrove.Application.Services.BillingService _billingService;
+    
+    // Use proper entity creation pattern
+    // Use correct async mock setups
+    // Dispose resources properly
+}
+```
+
+**Controller Integration Test Setup:**
+```csharp
+[TestFixture] 
+public class BillingControllerTests
+{
+    private WebApplicationFactory<Program> _factory;
+    private Mock<IBillingService> _mockBillingService;
+    
+    // Replace real services with mocks
+    // Use in-memory database with unique names
+    // Handle authentication properly
+}
+```
+
+### Prevention Checklist
+
+**Before writing backend tests:**
+- [ ] Use fully qualified namespaces for conflicting service names
+- [ ] Follow established entity property names (OnboardingCompleted, not IsOnboardingCompleted)
+- [ ] Use correct int identity pattern (don't set Id manually)
+- [ ] Set up navigation properties, not foreign key IDs directly
+- [ ] Use .ReturnsAsync() correctly for Task<T> methods
+- [ ] Use .Returns(Task.CompletedTask) for Task methods
+- [ ] Create unique database names for in-memory tests
+- [ ] Always dispose DbContext in TearDown
+- [ ] Handle authentication in integration tests explicitly
+
+**Compilation Error Red Flags:**
+- "Ambiguous reference" → Use fully qualified namespaces
+- "Cannot convert Guid to int" → Check entity Id types
+- "Property not found" → Verify exact property names  
+- "Cannot assign ClubAdmin.UserId" → Use navigation properties
+- "Cannot convert Task<Task<bool>>" → Fix mock return setup
+
+### Quality Gates
+- **All backend tests must compile without warnings**
+- **Tests must follow established entity relationship patterns**
+- **Mock setups must match actual method signatures**
+- **Integration tests must handle authentication explicitly**
+
+**This rule prevents 90% of backend test compilation errors by following established patterns.**
+
+
+

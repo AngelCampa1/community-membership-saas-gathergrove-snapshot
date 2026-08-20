@@ -1,0 +1,6 @@
+---
+description: 
+globs: *.cs
+alwaysApply: false
+---
+Encapsulate business logic in dedicated service classes (e.g., MemberService, PaymentService), keeping controllers thin. ALL database and external API operations MUST be async/await. Use constructor injection for dependencies (GatherGroveDbContext, services), registering them with appropriate lifetimes in Program.cs. Use .AsNoTracking() for all read-only queries.

@@ -1,0 +1,85 @@
+---
+description: writing and executing tests
+globs: 
+alwaysApply: false
+---
+This rule outlines the complete lifecycle for unit testing, from creation to post-implementation validation.
+
+## 13. Practical Testing Strategy & Validation Workflow
+
+### Testing Pyramid for GatherGrove: Maximum Bug Detection with Minimum Overhead
+
+**PRIORITY 1: E2E Tests (High-Level Confidence)**
+- **Focus**: 5-7 critical user journeys that provide the highest confidence
+- **Coverage**: Registration → Onboarding → Dashboard, Member Management, Dues Payment
+- **Purpose**: Catch regressions in main workflows, ensure end-to-end business logic works
+- **Tools**: Playwright with Page Object Model (POM) pattern
+
+**PRIORITY 2: Strategic Unit Tests (Fast Feedback for Complex Logic)**
+- **Focus**: Complex business logic ONLY - skip simple CRUD operations
+- **Coverage**: 
+  - Authentication logic (password hashing, JWT generation, token validation)
+  - Business calculations (dues calculations, membership renewals, payment processing)
+  - Complex validation rules and edge cases
+  - Utility functions with algorithms
+- **Skip**: Simple getters/setters, basic entity mappings, straightforward CRUD
+- **Tools**: 
+  - Backend: NUnit with Moq/NSubstitute for .NET
+  - Frontend: Jest with React Testing Library for TypeScript
+
+**PRIORITY 3: API Integration Tests (Contract Validation)**
+- **Focus**: Critical API endpoints that involve complex interactions
+- **Coverage**:
+  - Authentication endpoints (login, register, password reset)
+  - Complex business operations (member creation with dues calculation)
+  - Multi-step API workflows
+- **Skip**: Simple CRUD endpoints already covered by E2E tests
+- **Tools**: Integration test suite hitting actual API endpoints
+
+### Implementation Strategy
+
+#### A. Test Creation Guidelines:
+1. **Start with E2E** for confidence in core workflows
+2. **Add Unit tests only when** you encounter bugs that E2E can't catch or need faster feedback on complex algorithms
+3. **Add Integration tests for** critical API contracts not fully covered by E2E
+
+#### B. Coverage Requirements:
+- **E2E Tests**: Must cover all critical user journeys
+- **Unit Tests**: 80% coverage for business logic classes/functions being tested
+- **Integration Tests**: Cover authentication and complex business API endpoints
+
+#### C. Test Execution Mandate:
+Following the implementation of any user story, you MUST:
+
+1. **Execute Relevant Test Suite**: Run the appropriate tests (E2E for user stories, Unit for business logic changes)
+2. **All Tests Must Pass**: Implementation is not complete until tests pass
+3. **Root Cause Analysis**: If tests fail, determine if it's a legitimate bug or test issue, then fix accordingly
+4. **Coverage Verification**: For Unit tests, ensure 80% coverage for tested components
+
+#### D. Time-Saving Principles:
+- **Don't test everything** - focus on what provides the most value
+- **E2E tests catch most regressions** - rely on them for general confidence  
+- **Unit tests for complex logic** - only when algorithms or business rules are complex
+- **Integration tests for contracts** - only for critical API behavior
+
+#### E. When to Add Each Test Type:
+- **E2E**: For every new user story or major feature
+- **Unit**: When implementing complex calculations, validations, or algorithms
+- **Integration**: When creating new API endpoints with complex business logic
+
+### Examples of What to Test vs. Skip:
+
+**✅ DO TEST:**
+- Password reset flow (E2E)
+- Member registration with dues calculation (E2E + Unit for calculation)
+- JWT token generation and validation (Unit)
+- Complex membership renewal logic (Unit)
+- Authentication API endpoints (Integration)
+
+**❌ SKIP TESTING:**
+- Simple CRUD operations (GET /members, POST /members with basic validation)
+- Basic entity property getters/setters
+- Simple data transformations (DTO mappings)
+- UI components with minimal logic
+
+**The goal: Catch real bugs efficiently while minimizing testing overhead.**

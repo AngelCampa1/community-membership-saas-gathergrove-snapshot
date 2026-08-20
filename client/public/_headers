@@ -1,0 +1,38 @@
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/llms.txt
+  CDN-Cache-Control: max-age=86400
+
+/llms-full.txt
+  CDN-Cache-Control: max-age=86400
+
+/llms-pricing.txt
+  CDN-Cache-Control: max-age=86400
+
+/llms-glossary.txt
+  CDN-Cache-Control: max-age=86400
+
+/llms-how-to.txt
+  CDN-Cache-Control: max-age=86400
+
+/llms-alternatives.txt
+  CDN-Cache-Control: max-age=86400
+
+/ai-data.json
+  CDN-Cache-Control: max-age=86400
+
+/feed.xml
+  CDN-Cache-Control: max-age=3600
+  Content-Type: application/rss+xml; charset=utf-8
+
+/sitemap.xml
+  CDN-Cache-Control: max-age=86400
+  Content-Type: application/xml; charset=utf-8
+  Vary: Accept-Encoding
+
+/robots.txt
+  CDN-Cache-Control: max-age=86400
+
+# Last-Modified is set dynamically by route handlers using site-config date constants.
+# Do not hardcode dates here — they would override the correct dynamic values.

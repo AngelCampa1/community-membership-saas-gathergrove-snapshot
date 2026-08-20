@@ -1,0 +1,193 @@
+#!/usr/bin/env bash
+# pre-commit — GatherGrove quality gate
+# Runs automatically before every commit.
+# Only checks layers that have staged changes.
+# Backend, client, and mobile run in parallel when multiple are touched.
+
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+STAGED=$(git diff --cached --name-only --diff-filter=ACMR)
+
+has_changes_in() {
+  echo "$STAGED" | grep -q "^$1"
+}
+
+TMPDIR_HOOKS=$(mktemp -d)
+trap 'rm -rf "$TMPDIR_HOOKS"' EXIT
+
+# ── Design tokens — auto-rebuild when source changes ─────────────────────────
+
+if has_changes_in "shared/design-tokens/"; then
+  echo "▶ [pre-commit] Design tokens: source changed — rebuilding..."
+  (cd "$REPO_ROOT" && node shared/design-tokens/build.mjs) \
+    && echo "  ✓ tokens:build OK" \
+    || { echo "  ✗ tokens:build FAILED — commit blocked"; exit 1; }
+
+  # Stage all generated output files so they're included in this commit
+  git add \
+    "$REPO_ROOT/client/src/generated/tokens.css" \
+    "$REPO_ROOT/client/src/generated/tokens.ts" \
+    "$REPO_ROOT/mobile/src/generated/tokens.ts" \
+    "$REPO_ROOT/backend/src/GatherGrove.Application/Generated/DesignTokens.cs"
+
+  echo "  ✓ Generated files staged"
+fi
+
+# ── Backend (.NET) ───────────────────────────────────────────────────────────
+
+run_backend() {
+  local log="$TMPDIR_HOOKS/backend.log"
+  {
+    local failed=0
+
+    echo "▶ [pre-commit] Backend: format check (lint)..."
+    (cd "$REPO_ROOT/backend" && dotnet format --verify-no-changes --no-restore 2>&1) \
+      && echo "  ✓ Format check passed" \
+      || { echo "  ✗ Format check FAILED — run: dotnet format"; failed=1; }
+
+    echo "▶ [pre-commit] Backend: build (type check)..."
+    (cd "$REPO_ROOT/backend" && dotnet build --nologo -v minimal -warnaserror:false 2>&1) \
+      && echo "  ✓ Build passed" \
+      || { echo "  ✗ Build FAILED — commit blocked"; failed=1; }
+
+    echo "▶ [pre-commit] Backend: tests..."
+    (cd "$REPO_ROOT/backend" && dotnet test --nologo \
+      --logger "console;verbosity=minimal" \
+      --filter "Category!=E2E" 2>&1) \
+      && echo "  ✓ Tests passed" \
+      || { echo "  ✗ Tests FAILED — commit blocked"; failed=1; }
+
+    return $failed
+  } > "$log" 2>&1
+}
+
+# ── Client (Next.js) ─────────────────────────────────────────────────────────
+
+run_client() {
+  local log="$TMPDIR_HOOKS/client.log"
+  {
+    local failed=0
+
+    echo "▶ [pre-commit] Client: lint (staged files only)..."
+    local staged_client
+    staged_client=$(echo "$STAGED" | grep "^client/" | sed 's|^client/||' | grep -E '\.(ts|tsx|js|jsx)$' || true)
+    if [ -n "$staged_client" ]; then
+      (cd "$REPO_ROOT/client" && echo "$staged_client" | xargs npx eslint --cache --no-error-on-unmatched-pattern 2>&1) \
+        && echo "  ✓ Lint passed" \
+        || { echo "  ✗ Lint FAILED — commit blocked"; failed=1; }
+    else
+      echo "  ✓ Lint skipped (no staged .ts/.tsx/.js/.jsx files)"
+    fi
+
+    echo "▶ [pre-commit] Client: type check..."
+    (cd "$REPO_ROOT/client" && npm run typecheck 2>&1) \
+      && echo "  ✓ Type check passed" \
+      || { echo "  ✗ Type check FAILED — commit blocked"; failed=1; }
+
+    echo "▶ [pre-commit] Client: tests (staged test files + co-located tests)..."
+    # Collect CLIENT-RELATIVE test paths (jest runs from client/, testPathPattern
+    # is matched as a regex substring against absolute paths). Using relative paths
+    # plus de-duplication keeps the command line well under the Windows ~8191-char
+    # limit even when many files are staged.
+    local test_files=""
+    while IFS= read -r f; do
+      [ -z "$f" ] && continue
+      if echo "$f" | grep -qE '\.test\.(ts|tsx)$'; then
+        # Staged test file — add directly
+        test_files="${test_files}${f}"$'\n'
+      elif echo "$f" | grep -qE '\.(ts|tsx)$'; then
+        # Staged source file — look for co-located __tests__/basename.test.ts(x)
+        local dir; dir=$(dirname "$f")
+        local base; base=$(basename "$f" | sed 's/\.\(ts\|tsx\)$//')
+        for ext in ts tsx; do
+          local t="$dir/__tests__/$base.test.$ext"
+          [ -f "$REPO_ROOT/client/$t" ] && test_files="${test_files}${t}"$'\n'
+        done
+      fi
+    done < <(echo "$STAGED" | grep "^client/" | sed 's|^client/||')
+    local test_pattern
+    test_pattern=$(printf '%s' "$test_files" | sed '/^$/d' | sort -u | paste -sd'|' -)
+    if [ -n "$test_pattern" ]; then
+      (cd "$REPO_ROOT/client" && timeout 300 npm test -- --watchAll=false --forceExit --passWithNoTests \
+        --maxWorkers=2 --testPathPattern="$test_pattern" 2>&1) \
+        && echo "  ✓ Tests passed" \
+        || { echo "  ✗ Tests FAILED — commit blocked"; failed=1; }
+    else
+      echo "  ✓ Tests skipped (no staged test files)"
+    fi
+
+    echo "▶ [pre-commit] Client: build..."
+    (cd "$REPO_ROOT/client" && npm run build 2>&1) \
+      && echo "  ✓ Build passed" \
+      || { echo "  ✗ Build FAILED — commit blocked"; failed=1; }
+
+    return $failed
+  } > "$log" 2>&1
+}
+
+# ── Mobile (React Native) ────────────────────────────────────────────────────
+
+run_mobile() {
+  local log="$TMPDIR_HOOKS/mobile.log"
+  {
+    local failed=0
+
+    echo "▶ [pre-commit] Mobile: lint..."
+    (cd "$REPO_ROOT/mobile" && npm run lint 2>&1) \
+      && echo "  ✓ Lint passed" \
+      || { echo "  ✗ Lint FAILED — commit blocked"; failed=1; }
+
+    echo "▶ [pre-commit] Mobile: type check..."
+    (cd "$REPO_ROOT/mobile" && npm run typecheck 2>&1) \
+      && echo "  ✓ Type check passed" \
+      || { echo "  ✗ Type check FAILED — commit blocked"; failed=1; }
+
+    echo "▶ [pre-commit] Mobile: tests..."
+    (cd "$REPO_ROOT/mobile" && timeout 600 npm test -- --watchAll=false --forceExit --passWithNoTests --maxWorkers=2 2>&1) \
+      && echo "  ✓ Tests passed" \
+      || { echo "  ✗ Tests FAILED or timed out — commit blocked"; failed=1; }
+
+    return $failed
+  } > "$log" 2>&1
+}
+
+# ── Run checks sequentially ──────────────────────────────────────────────────
+
+TOUCHED=0
+FAILED=0
+
+if has_changes_in "backend/"; then
+  TOUCHED=1
+  run_backend || FAILED=1
+fi
+
+if has_changes_in "client/"; then
+  TOUCHED=1
+  run_client || FAILED=1
+fi
+
+if has_changes_in "mobile/"; then
+  TOUCHED=1
+  run_mobile || FAILED=1
+fi
+
+if [ "$TOUCHED" -eq 0 ]; then
+  exit 0
+fi
+
+# Print all logs in order
+for track in backend client mobile; do
+  if [ -f "$TMPDIR_HOOKS/$track.log" ]; then
+    cat "$TMPDIR_HOOKS/$track.log"
+  fi
+done
+
+if [[ $FAILED -ne 0 ]]; then
+  echo ""
+  echo "pre-commit: commit blocked — fix the errors above first."
+  echo "Tip: run ./scripts/check.sh to see all failures."
+  exit 1
+fi
+
+exit 0

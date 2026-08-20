@@ -1,0 +1,6 @@
+---
+description: writing code
+globs: 
+alwaysApply: false
+---
+Write clear code. Add XML documentation (C#) or JSDoc/TSDoc (TypeScript) for public APIs and complex functions. Strictly adhere to C# (PascalCase for public members) and TypeScript (camelCase for variables/functions) naming conventions.

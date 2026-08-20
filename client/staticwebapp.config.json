@@ -1,0 +1,41 @@
+{
+  "routes": [
+    {
+      "route": "/.well-known/*",
+      "allowedRoles": ["anonymous"],
+      "headers": {
+        "Cache-Control": "public, max-age=3600",
+        "Content-Type": "text/plain"
+      }
+    },
+    {
+      "route": "/.well-known/pki-validation/*",
+      "allowedRoles": ["anonymous"],
+      "headers": {
+        "Cache-Control": "public, max-age=3600",
+        "Content-Type": "text/plain"
+      }
+    },
+    {
+      "route": "/api/*",
+      "allowedRoles": ["anonymous"]
+    }
+  ],
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/api/*", "/.well-known/*", "*.{css,scss,js,png,gif,ico,jpg,svg,txt}"]
+  },
+  "mimeTypes": {
+    ".json": "text/json",
+    ".txt": "text/plain"
+  },
+  "globalHeaders": {
+    "Cache-Control": "no-cache",
+    "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://widgets.ventoralabs.com https://js.stripe.com https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://widgets.ventoralabs.com https://api.stripe.com https://api-gathergrove-staging.azurewebsites.net https://api-gathergrove-prod.azurewebsites.net https://api.gathergrove.club http://localhost:5284 https://www.google-analytics.com https://www.googletagmanager.com; frame-src 'self' https://js.stripe.com; object-src 'none'; base-uri 'self'; form-action 'self'"
+  },
+  "responseOverrides": {
+    "404": {
+      "rewrite": "/404.html"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+# Azure SSL Certificate Validation
+# Domain: gathergrove.club, *.gathergrove.club
+# Purpose: Domain validation for Azure Static Web Apps SSL certificate
+# Status: Active
+# Created: 2025-08-29T21:09:00Z
+
+AZURE_SSL_VALIDATION=ACTIVE
+DOMAIN=gathergrove.club
+WILDCARD_DOMAIN=*.gathergrove.club
+VALIDATION_TYPE=DV
+CERTIFICATE_PROVIDER=Microsoft_Azure
+VALIDATION_DATE=2025-08-29
+EXPIRY_CHECK=ENABLED

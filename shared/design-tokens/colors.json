@@ -1,0 +1,288 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "name": "GatherGrove Design System Colors",
+  "description": "Unified color palette for web and mobile applications",
+
+  "brand": {
+    "primary": {
+      "50":  { "value": "#f0f9f4", "type": "color", "description": "Lightest primary" },
+      "100": { "value": "#daf1e3", "type": "color", "description": "Very light primary" },
+      "200": { "value": "#b8e3ca", "type": "color", "description": "Light primary" },
+      "300": { "value": "#8acfaa", "type": "color", "description": "Medium light primary" },
+      "400": { "value": "#5bb586", "type": "color", "description": "Medium primary" },
+      "500": { "value": "#4a9a72", "type": "color", "description": "Main primary — HSL(150, 35%, 45%)" },
+      "600": { "value": "#3d8060", "type": "color", "description": "Dark primary — HSL(150, 35%, 37%)" },
+      "700": { "value": "#33664d", "type": "color", "description": "Darker primary" },
+      "800": { "value": "#2b5240", "type": "color", "description": "Very dark primary" },
+      "900": { "value": "#264436", "type": "color", "description": "Darkest primary" },
+      "950": { "value": "#12261c", "type": "color", "description": "Near black primary" }
+    },
+    "secondary": {
+      "50":  { "value": "#f4f9f7", "type": "color" },
+      "100": { "value": "#e9f2ee", "type": "color" },
+      "200": { "value": "#d3e6dd", "type": "color" },
+      "300": { "value": "#b0d3c3", "type": "color" },
+      "400": { "value": "#86baa3", "type": "color" },
+      "500": { "value": "#649f86", "type": "color" },
+      "600": { "value": "#4f836d", "type": "color" },
+      "700": { "value": "#416a59", "type": "color" },
+      "800": { "value": "#375649", "type": "color" },
+      "900": { "value": "#30483e", "type": "color" },
+      "950": { "value": "#1a2822", "type": "color" }
+    },
+    "accent": {
+      "50":  { "value": "#f0fdf4", "type": "color" },
+      "100": { "value": "#dcfce7", "type": "color" },
+      "200": { "value": "#bbf7d0", "type": "color" },
+      "300": { "value": "#86efac", "type": "color" },
+      "400": { "value": "#4ade80", "type": "color" },
+      "500": { "value": "#22c55e", "type": "color" },
+      "600": { "value": "#16a34a", "type": "color" },
+      "700": { "value": "#15803d", "type": "color" },
+      "800": { "value": "#166534", "type": "color" },
+      "900": { "value": "#14532d", "type": "color" },
+      "950": { "value": "#052e16", "type": "color" }
+    }
+  },
+
+  "semantic": {
+    "success": {
+      "light": { "value": "#16a149", "type": "color", "description": "HSL(142, 76%, 36%)" },
+      "dark":  { "value": "#4ade80", "type": "color", "description": "HSL(142, 70%, 50%)" },
+      "50":  { "value": "#f0fdf4", "type": "color" },
+      "100": { "value": "#dcfce7", "type": "color" },
+      "200": { "value": "#bbf7d0", "type": "color" },
+      "300": { "value": "#86efac", "type": "color" },
+      "400": { "value": "#4ade80", "type": "color" },
+      "500": { "value": "#16a149", "type": "color" },
+      "600": { "value": "#15803d", "type": "color" },
+      "700": { "value": "#166534", "type": "color" },
+      "800": { "value": "#14532d", "type": "color" },
+      "900": { "value": "#052e16", "type": "color" }
+    },
+    "warning": {
+      "light": { "value": "#f59e0b", "type": "color", "description": "HSL(38, 92%, 50%)" },
+      "dark":  { "value": "#fbbf24", "type": "color", "description": "HSL(38, 85%, 60%)" },
+      "50":  { "value": "#fffbeb", "type": "color" },
+      "100": { "value": "#fef3c7", "type": "color" },
+      "200": { "value": "#fde68a", "type": "color" },
+      "300": { "value": "#fcd34d", "type": "color" },
+      "400": { "value": "#fbbf24", "type": "color" },
+      "500": { "value": "#f59e0b", "type": "color" },
+      "600": { "value": "#d97706", "type": "color" },
+      "700": { "value": "#b45309", "type": "color" },
+      "800": { "value": "#92400e", "type": "color" },
+      "900": { "value": "#78350f", "type": "color" }
+    },
+    "error": {
+      "light": { "value": "#ef4444", "type": "color", "description": "HSL(0, 84%, 60%)" },
+      "dark":  { "value": "#f87171", "type": "color", "description": "HSL(0, 75%, 65%)" },
+      "50":  { "value": "#fef2f2", "type": "color" },
+      "100": { "value": "#fee2e2", "type": "color" },
+      "200": { "value": "#fecaca", "type": "color" },
+      "300": { "value": "#fca5a5", "type": "color" },
+      "400": { "value": "#f87171", "type": "color" },
+      "500": { "value": "#ef4444", "type": "color" },
+      "600": { "value": "#dc2626", "type": "color" },
+      "700": { "value": "#b91c1c", "type": "color" },
+      "800": { "value": "#991b1b", "type": "color" },
+      "900": { "value": "#7f1d1d", "type": "color" }
+    },
+    "info": {
+      "light": { "value": "#3b82f6", "type": "color" },
+      "dark":  { "value": "#60a5fa", "type": "color" },
+      "50":  { "value": "#eff6ff", "type": "color" },
+      "100": { "value": "#dbeafe", "type": "color" },
+      "200": { "value": "#bfdbfe", "type": "color" },
+      "300": { "value": "#93c5fd", "type": "color" },
+      "400": { "value": "#60a5fa", "type": "color" },
+      "500": { "value": "#3b82f6", "type": "color" },
+      "600": { "value": "#2563eb", "type": "color" },
+      "700": { "value": "#1d4ed8", "type": "color" },
+      "800": { "value": "#1e40af", "type": "color" },
+      "900": { "value": "#1e3a8a", "type": "color" }
+    }
+  },
+
+  "neutral": {
+    "50":  { "value": "#f8faf9", "type": "color", "description": "Lightest neutral with green tint" },
+    "100": { "value": "#eff4f2", "type": "color" },
+    "200": { "value": "#e3ece8", "type": "color" },
+    "300": { "value": "#c8d6d0", "type": "color" },
+    "400": { "value": "#94a89f", "type": "color" },
+    "500": { "value": "#6b7d75", "type": "color" },
+    "600": { "value": "#4a5a52", "type": "color" },
+    "700": { "value": "#354540", "type": "color" },
+    "800": { "value": "#23372d", "type": "color" },
+    "900": { "value": "#19241e", "type": "color" },
+    "950": { "value": "#101814", "type": "color", "description": "Darkest neutral" }
+  },
+
+  "chart": {
+    "palette": {
+      "1": { "value": "#4a9a72", "type": "color", "description": "Primary green" },
+      "2": { "value": "#3b82f6", "type": "color", "description": "Blue" },
+      "3": { "value": "#f59e0b", "type": "color", "description": "Amber" },
+      "4": { "value": "#ef4444", "type": "color", "description": "Red" },
+      "5": { "value": "#8b5cf6", "type": "color", "description": "Purple" },
+      "6": { "value": "#06b6d4", "type": "color", "description": "Cyan" },
+      "7": { "value": "#ec4899", "type": "color", "description": "Pink" },
+      "8": { "value": "#14b8a6", "type": "color", "description": "Teal" }
+    },
+    "positive": { "value": "#16a149", "type": "color" },
+    "negative": { "value": "#ef4444", "type": "color" },
+    "neutral":  { "value": "#6b7d75", "type": "color" }
+  },
+
+  "theme": {
+    "light": {
+      "background": {
+        "primary":   { "value": "#ffffff", "type": "color" },
+        "secondary": { "value": "#f8faf9", "type": "color" },
+        "tertiary":  { "value": "#eff4f2", "type": "color" },
+        "overlay":   { "value": "rgba(0, 0, 0, 0.5)", "type": "color" }
+      },
+      "foreground": {
+        "primary":   { "value": "#181a1f", "type": "color" },
+        "secondary": { "value": "#4a5a52", "type": "color" },
+        "tertiary":  { "value": "#6b7d75", "type": "color" },
+        "inverse":   { "value": "#ffffff", "type": "color" }
+      },
+      "border": {
+        "primary":   { "value": "#e3ece8", "type": "color" },
+        "secondary": { "value": "#c8d6d0", "type": "color" },
+        "focus":     { "value": "#4a9a72", "type": "color" }
+      },
+      "interactive": {
+        "primary":        { "value": "#4a9a72", "type": "color" },
+        "primaryHover":   { "value": "#3d8060", "type": "color" },
+        "secondary":      { "value": "#eff4f2", "type": "color" },
+        "secondaryHover": { "value": "#e3ece8", "type": "color" },
+        "disabled":       { "value": "#c8d6d0", "type": "color" },
+        "disabledText":   { "value": "#94a89f", "type": "color" }
+      }
+    },
+    "dark": {
+      "background": {
+        "primary":   { "value": "#101814", "type": "color" },
+        "secondary": { "value": "#19241e", "type": "color" },
+        "tertiary":  { "value": "#23372d", "type": "color" },
+        "overlay":   { "value": "rgba(0, 0, 0, 0.8)", "type": "color" }
+      },
+      "foreground": {
+        "primary":   { "value": "#f3f5f4", "type": "color" },
+        "secondary": { "value": "#c8d6d0", "type": "color" },
+        "tertiary":  { "value": "#94a89f", "type": "color" },
+        "inverse":   { "value": "#181a1f", "type": "color" }
+      },
+      "border": {
+        "primary":   { "value": "#354540", "type": "color" },
+        "secondary": { "value": "#4a5a52", "type": "color" },
+        "focus":     { "value": "#7dcda5", "type": "color" }
+      },
+      "interactive": {
+        "primary":        { "value": "#7dcda5", "type": "color" },
+        "primaryHover":   { "value": "#8cd8b2", "type": "color" },
+        "secondary":      { "value": "#23372d", "type": "color" },
+        "secondaryHover": { "value": "#354540", "type": "color" },
+        "disabled":       { "value": "#4a5a52", "type": "color" },
+        "disabledText":   { "value": "#6b7d75", "type": "color" }
+      }
+    }
+  },
+
+  "special": {
+    "star": { "value": "#fbbf24", "type": "color", "description": "Rating stars" },
+    "link": {
+      "light": { "value": "#3d8060", "type": "color" },
+      "dark":  { "value": "#7dcda5", "type": "color" }
+    },
+    "socialAuth": {
+      "google":    { "value": "#4285F4", "type": "color" },
+      "apple":     { "value": "#000000", "type": "color" },
+      "microsoft": { "value": "#00a4ef", "type": "color" }
+    }
+  },
+
+  "cssVars": {
+    "_comment": "Exact HSL triplets for CSS custom properties. These ARE the canonical values for web CSS; no hex conversion needed. Format: 'H S% L%' (no hsl() wrapper, for use as hsl(var(--x)) in Tailwind).",
+
+    "light": {
+      "--background":              "0 0% 100%",
+      "--background-subtle":       "150 20% 98%",
+      "--foreground":              "220 14% 11%",
+      "--card":                    "0 0% 100%",
+      "--card-foreground":         "220 14% 11%",
+      "--popover":                 "0 0% 100%",
+      "--popover-foreground":      "220 14% 11%",
+      "--primary":                 "150 35% 45%",
+      "--primary-hover":           "150 40% 40%",
+      "--primary-foreground":      "0 0% 98%",
+      "--secondary":               "150 20% 95%",
+      "--secondary-hover":         "150 25% 90%",
+      "--secondary-foreground":    "150 35% 25%",
+      "--muted":                   "150 15% 96%",
+      "--muted-foreground":        "150 10% 46%",
+      "--accent":                  "120 60% 85%",
+      "--accent-foreground":       "150 35% 25%",
+      "--destructive":             "0 84% 60%",
+      "--destructive-foreground":  "0 0% 98%",
+      "--border":                  "150 20% 91%",
+      "--border-subtle":           "150 15% 94%",
+      "--input":                   "150 15% 97%",
+      "--input-border":            "150 20% 87%",
+      "--ring":                    "150 35% 45%",
+      "--success":                 "142 76% 36%",
+      "--success-foreground":      "0 0% 98%",
+      "--warning":                 "38 92% 50%",
+      "--warning-foreground":      "0 0% 98%",
+      "--sidebar":                 "0 0% 100%",
+      "--sidebar-foreground":      "220 14% 11%",
+      "--sidebar-primary":         "150 35% 45%",
+      "--sidebar-primary-foreground": "0 0% 98%",
+      "--sidebar-accent":          "150 20% 95%",
+      "--sidebar-accent-foreground": "150 35% 25%",
+      "--sidebar-border":          "150 20% 91%",
+      "--sidebar-ring":            "150 35% 45%"
+    },
+
+    "dark": {
+      "--background":              "150 20% 8%",
+      "--background-subtle":       "150 18% 12%",
+      "--foreground":              "150 8% 96%",
+      "--card":                    "150 22% 11%",
+      "--card-foreground":         "150 8% 96%",
+      "--popover":                 "150 22% 11%",
+      "--popover-foreground":      "150 8% 96%",
+      "--primary":                 "150 45% 65%",
+      "--primary-hover":           "150 50% 70%",
+      "--primary-foreground":      "150 22% 11%",
+      "--secondary":               "150 18% 14%",
+      "--secondary-hover":         "150 18% 18%",
+      "--secondary-foreground":    "150 8% 96%",
+      "--muted":                   "150 18% 14%",
+      "--muted-foreground":        "150 12% 65%",
+      "--accent":                  "120 40% 75%",
+      "--accent-foreground":       "150 22% 11%",
+      "--destructive":             "0 75% 65%",
+      "--destructive-foreground":  "150 22% 11%",
+      "--border":                  "150 22% 18%",
+      "--border-subtle":           "150 20% 22%",
+      "--input":                   "150 22% 14%",
+      "--input-border":            "150 22% 20%",
+      "--ring":                    "150 45% 65%",
+      "--success":                 "142 70% 50%",
+      "--success-foreground":      "150 22% 11%",
+      "--warning":                 "38 85% 60%",
+      "--warning-foreground":      "150 22% 11%",
+      "--sidebar":                 "150 25% 10%",
+      "--sidebar-foreground":      "150 10% 95%",
+      "--sidebar-primary":         "150 50% 70%",
+      "--sidebar-primary-foreground": "150 25% 10%",
+      "--sidebar-accent":          "150 25% 18%",
+      "--sidebar-accent-foreground": "150 10% 95%",
+      "--sidebar-border":          "150 25% 20%",
+      "--sidebar-ring":            "150 50% 70%"
+    }
+  }
+}

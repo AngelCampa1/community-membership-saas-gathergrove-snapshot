@@ -1,0 +1,332 @@
+# Azure DevOps Pipeline for GatherGrove iOS Builds
+# Migrated from EAS Build
+#
+# Prerequisites:
+# 1. Secure Files (Pipelines > Library > Secure files):
+#    - ios-distribution.p12 (Distribution certificate)
+#    - GatherGrove_Development.mobileprovision (for development builds)
+#    - GatherGrove_AdHoc.mobileprovision (for preview/internal builds)
+#    - GatherGrove_AppStore.mobileprovision (for production builds)
+#    - AppStoreConnectApiKey.p8 (for TestFlight uploads)
+#
+# 2. Variable Group 'ios-signing' (Pipelines > Library > Variable groups):
+#    - P12_PASSWORD: Certificate password
+#    - APPLE_TEAM_ID: REPLACE_WITH_APPLE_TEAM_ID
+#    - APP_STORE_CONNECT_API_KEY_ID: Your API Key ID
+#    - APP_STORE_CONNECT_API_ISSUER_ID: Your Issuer ID
+#
+# 3. Variable Group 'mobile-env' (optional, for app environment variables):
+#    - API_BASE_URL: Production API URL
+
+trigger:
+  branches:
+    include:
+      - main
+      - develop
+      - release/*
+  paths:
+    include:
+      - mobile/**
+
+pr:
+  branches:
+    include:
+      - main
+      - develop
+  paths:
+    include:
+      - mobile/**
+
+parameters:
+  - name: buildProfile
+    displayName: 'Build Profile'
+    type: string
+    default: 'preview'
+    values:
+      - development
+      - preview
+      - production
+
+  - name: submitToTestFlight
+    displayName: 'Submit to TestFlight'
+    type: boolean
+    default: false
+
+variables:
+  - group: ios-signing
+  - name: NODE_VERSION
+    value: '22.12.0'
+  - name: WORKING_DIRECTORY
+    value: 'mobile'
+  - name: BUNDLE_IDENTIFIER
+    value: 'com.gathergrove.mobile'
+  - name: SCHEME_NAME
+    value: 'GatherGroveMobile'
+
+stages:
+  # ============================================
+  # Stage: Build iOS App
+  # ============================================
+  - stage: Build
+    displayName: 'Build iOS (${{ parameters.buildProfile }})'
+    pool:
+      vmImage: 'macos-14'
+    jobs:
+      - job: BuildiOS
+        displayName: 'Build iOS App'
+        timeoutInMinutes: 60
+        steps:
+          # ------------------------------
+          # Setup
+          # ------------------------------
+          - checkout: self
+            fetchDepth: 0
+            displayName: 'Checkout repository'
+
+          - task: NodeTool@0
+            displayName: 'Install Node.js $(NODE_VERSION)'
+            inputs:
+              versionSpec: '$(NODE_VERSION)'
+
+          # Cache node_modules
+          - task: Cache@2
+            displayName: 'Cache npm packages'
+            inputs:
+              key: 'npm | "$(Agent.OS)" | $(WORKING_DIRECTORY)/package-lock.json'
+              path: '$(WORKING_DIRECTORY)/node_modules'
+              restoreKeys: |
+                npm | "$(Agent.OS)"
+
+          # Cache CocoaPods
+          - task: Cache@2
+            displayName: 'Cache CocoaPods'
+            inputs:
+              key: 'pods | "$(Agent.OS)" | $(WORKING_DIRECTORY)/ios/Podfile.lock'
+              path: '$(WORKING_DIRECTORY)/ios/Pods'
+              restoreKeys: |
+                pods | "$(Agent.OS)"
+
+          - script: npm ci
+            displayName: 'Install npm dependencies'
+            workingDirectory: $(WORKING_DIRECTORY)
+
+          # ------------------------------
+          # Expo Prebuild (Generate native iOS project)
+          # ------------------------------
+          - script: |
+              npx expo prebuild --platform ios --clean
+            displayName: 'Expo Prebuild iOS'
+            workingDirectory: $(WORKING_DIRECTORY)
+            env:
+              APP_ENV: ${{ parameters.buildProfile }}
+              CI: true
+
+          # ------------------------------
+          # CocoaPods
+          # ------------------------------
+          - script: |
+              cd ios
+              pod install --repo-update
+            displayName: 'Install CocoaPods dependencies'
+            workingDirectory: $(WORKING_DIRECTORY)
+
+          # ------------------------------
+          # Code Signing - Development (Simulator)
+          # ------------------------------
+          - ${{ if eq(parameters.buildProfile, 'development') }}:
+            - script: |
+                echo "Building for iOS Simulator (no signing required)"
+              displayName: 'Skip signing for simulator build'
+
+            - task: Xcode@5
+              displayName: 'Build iOS (Simulator)'
+              inputs:
+                actions: 'build'
+                configuration: 'Debug'
+                sdk: 'iphonesimulator'
+                xcWorkspacePath: '$(WORKING_DIRECTORY)/ios/$(SCHEME_NAME).xcworkspace'
+                scheme: '$(SCHEME_NAME)'
+                packageApp: false
+                signingOption: 'nosign'
+                useXcpretty: true
+                xcprettyArgs: '--color'
+
+          # ------------------------------
+          # Code Signing - Preview (Ad-Hoc / Internal Distribution)
+          # ------------------------------
+          - ${{ if eq(parameters.buildProfile, 'preview') }}:
+            - task: InstallAppleCertificate@2
+              displayName: 'Install Distribution Certificate'
+              inputs:
+                certSecureFile: 'ios-distribution.p12'
+                certPwd: '$(P12_PASSWORD)'
+                keychain: 'temp'
+                deleteCert: true
+
+            - task: InstallAppleProvisioningProfile@1
+              displayName: 'Install Ad-Hoc Provisioning Profile'
+              inputs:
+                provisioningProfileLocation: 'secureFiles'
+                provProfileSecureFile: 'GatherGrove_AdHoc.mobileprovision'
+                removeProfile: true
+
+            - task: Xcode@5
+              displayName: 'Build iOS (Ad-Hoc)'
+              inputs:
+                actions: 'build'
+                configuration: 'Release'
+                sdk: 'iphoneos'
+                xcWorkspacePath: '$(WORKING_DIRECTORY)/ios/$(SCHEME_NAME).xcworkspace'
+                scheme: '$(SCHEME_NAME)'
+                packageApp: true
+                exportPath: '$(Build.ArtifactStagingDirectory)/ios'
+                exportOptions: 'plist'
+                exportOptionsPlist: '$(WORKING_DIRECTORY)/ios/ExportOptions-AdHoc.plist'
+                signingOption: 'manual'
+                signingIdentity: '$(APPLE_CERTIFICATE_SIGNING_IDENTITY)'
+                provisioningProfileUuid: '$(APPLE_PROV_PROFILE_UUID)'
+                useXcpretty: true
+                xcprettyArgs: '--color'
+
+          # ------------------------------
+          # Code Signing - Production (App Store)
+          # ------------------------------
+          - ${{ if eq(parameters.buildProfile, 'production') }}:
+            - task: InstallAppleCertificate@2
+              displayName: 'Install Distribution Certificate'
+              inputs:
+                certSecureFile: 'ios-distribution.p12'
+                certPwd: '$(P12_PASSWORD)'
+                keychain: 'temp'
+                deleteCert: true
+
+            - task: InstallAppleProvisioningProfile@1
+              displayName: 'Install App Store Provisioning Profile'
+              inputs:
+                provisioningProfileLocation: 'secureFiles'
+                provProfileSecureFile: 'GatherGrove_AppStore.mobileprovision'
+                removeProfile: true
+
+            - task: Xcode@5
+              displayName: 'Build iOS (App Store)'
+              inputs:
+                actions: 'build'
+                configuration: 'Release'
+                sdk: 'iphoneos'
+                xcWorkspacePath: '$(WORKING_DIRECTORY)/ios/$(SCHEME_NAME).xcworkspace'
+                scheme: '$(SCHEME_NAME)'
+                packageApp: true
+                exportPath: '$(Build.ArtifactStagingDirectory)/ios'
+                exportOptions: 'plist'
+                exportOptionsPlist: '$(WORKING_DIRECTORY)/ios/ExportOptions-AppStore.plist'
+                signingOption: 'manual'
+                signingIdentity: '$(APPLE_CERTIFICATE_SIGNING_IDENTITY)'
+                provisioningProfileUuid: '$(APPLE_PROV_PROFILE_UUID)'
+                useXcpretty: true
+                xcprettyArgs: '--color'
+
+          # ------------------------------
+          # Publish Artifacts
+          # ------------------------------
+          - ${{ if ne(parameters.buildProfile, 'development') }}:
+            - task: CopyFiles@2
+              displayName: 'Copy IPA to staging'
+              inputs:
+                SourceFolder: '$(Build.ArtifactStagingDirectory)/ios'
+                Contents: '**/*.ipa'
+                TargetFolder: '$(Build.ArtifactStagingDirectory)/publish'
+
+            - task: PublishBuildArtifacts@1
+              displayName: 'Publish IPA artifact'
+              inputs:
+                PathtoPublish: '$(Build.ArtifactStagingDirectory)/publish'
+                ArtifactName: 'ios-${{ parameters.buildProfile }}'
+                publishLocation: 'Container'
+
+  # ============================================
+  # Stage: Submit to TestFlight
+  # ============================================
+  - stage: SubmitToTestFlight
+    displayName: 'Submit to TestFlight'
+    dependsOn: Build
+    condition: |
+      and(
+        succeeded(),
+        eq('${{ parameters.submitToTestFlight }}', 'true'),
+        eq('${{ parameters.buildProfile }}', 'production')
+      )
+    pool:
+      vmImage: 'macos-14'
+    jobs:
+      - job: Upload
+        displayName: 'Upload to App Store Connect'
+        steps:
+          - download: current
+            artifact: 'ios-production'
+            displayName: 'Download IPA artifact'
+
+          # Install App Store Connect API Key
+          - task: DownloadSecureFile@1
+            name: apiKey
+            displayName: 'Download App Store Connect API Key'
+            inputs:
+              secureFile: 'AppStoreConnectApiKey.p8'
+
+          - script: |
+              # Create private_keys directory for altool/notarytool
+              mkdir -p ~/private_keys
+              cp $(apiKey.secureFilePath) ~/private_keys/AuthKey_$(APP_STORE_CONNECT_API_KEY_ID).p8
+
+              # Find the IPA file
+              IPA_PATH=$(find "$(Pipeline.Workspace)/ios-production" -name "*.ipa" -type f | head -1)
+
+              if [ -z "$IPA_PATH" ]; then
+                echo "##vso[task.logissue type=error]No IPA file found"
+                exit 1
+              fi
+
+              echo "Uploading IPA: $IPA_PATH"
+
+              # Upload using xcrun altool
+              xcrun altool --upload-app \
+                --type ios \
+                --file "$IPA_PATH" \
+                --apiKey "$(APP_STORE_CONNECT_API_KEY_ID)" \
+                --apiIssuer "$(APP_STORE_CONNECT_API_ISSUER_ID)"
+
+              echo "##vso[task.complete result=Succeeded;]Upload complete!"
+            displayName: 'Upload to TestFlight'
+            env:
+              APP_STORE_CONNECT_API_KEY_ID: $(APP_STORE_CONNECT_API_KEY_ID)
+              APP_STORE_CONNECT_API_ISSUER_ID: $(APP_STORE_CONNECT_API_ISSUER_ID)
+
+  # ============================================
+  # Stage: Notify (Optional)
+  # ============================================
+  - stage: Notify
+    displayName: 'Send Notifications'
+    dependsOn:
+      - Build
+      - SubmitToTestFlight
+    condition: always()
+    pool:
+      vmImage: 'ubuntu-latest'
+    jobs:
+      - job: NotifyTeam
+        displayName: 'Notify Team'
+        steps:
+          - script: |
+              BUILD_STATUS="unknown"
+              if [ "$(Agent.JobStatus)" == "Succeeded" ]; then
+                BUILD_STATUS="succeeded"
+              elif [ "$(Agent.JobStatus)" == "Failed" ]; then
+                BUILD_STATUS="failed"
+              fi
+
+              echo "Build ${{ parameters.buildProfile }} $BUILD_STATUS"
+              echo "Build ID: $(Build.BuildId)"
+              echo "Build Number: $(Build.BuildNumber)"
+
+              # Add your notification logic here (Slack, Teams, Email, etc.)
+              # Example: curl -X POST to webhook URL
+            displayName: 'Send build notification'

@@ -1,0 +1,15 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Before creating files/folders, analyze the current project structure and place new items consistently.
+
+**PREREQUISITE: Check `/docs/status/implementation-overview.md` (per Rule 0) for the complete current repository structure and file locations.**
+
+Backend: Place new items consistently with the established layered architecture (e.g., new services in the GatherGrove.Application/Services folder).
+Frontend: The frontend MUST use Next.js Route Groups to separate the public-facing marketing site from the private, authenticated application.
+Public pages (landing, pricing, etc.) go inside a src/app/(marketing) directory.
+Authenticated application pages (dashboard, members, etc.) go inside a src/app/(app) directory.
+
+Each route group will have its own layout.tsx file to manage its specific UI shell.

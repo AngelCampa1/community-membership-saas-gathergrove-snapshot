@@ -1,0 +1,6 @@
+---
+description: log
+globs: 
+alwaysApply: false
+---
+Capture unhandled JavaScript/React errors and log them to a backend endpoint or a service like Sentry. Log all API request/response metadata on the backend. Implement a standard /health check endpoint for monitoring.

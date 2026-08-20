@@ -1,0 +1,53 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "name": "GatherGrove Spacing Tokens",
+  "description": "Spacing scale and layout tokens. Web values are rem strings; mobile values are numeric px (multiply rem by 16).",
+
+  "spacing": {
+    "0":    { "value": "0",       "type": "spacing", "mobile": 0 },
+    "px":   { "value": "1px",     "type": "spacing", "mobile": 1 },
+    "0-5":  { "value": "0.125rem","type": "spacing", "mobile": 2 },
+    "1":    { "value": "0.25rem", "type": "spacing", "mobile": 4 },
+    "1-5":  { "value": "0.375rem","type": "spacing", "mobile": 6 },
+    "2":    { "value": "0.5rem",  "type": "spacing", "mobile": 8 },
+    "2-5":  { "value": "0.625rem","type": "spacing", "mobile": 10 },
+    "3":    { "value": "0.75rem", "type": "spacing", "mobile": 12 },
+    "3-5":  { "value": "0.875rem","type": "spacing", "mobile": 14 },
+    "4":    { "value": "1rem",    "type": "spacing", "mobile": 16 },
+    "5":    { "value": "1.25rem", "type": "spacing", "mobile": 20 },
+    "6":    { "value": "1.5rem",  "type": "spacing", "mobile": 24 },
+    "7":    { "value": "1.75rem", "type": "spacing", "mobile": 28 },
+    "8":    { "value": "2rem",    "type": "spacing", "mobile": 32 },
+    "9":    { "value": "2.25rem", "type": "spacing", "mobile": 36 },
+    "10":   { "value": "2.5rem",  "type": "spacing", "mobile": 40 },
+    "11":   { "value": "2.75rem", "type": "spacing", "mobile": 44 },
+    "12":   { "value": "3rem",    "type": "spacing", "mobile": 48 },
+    "14":   { "value": "3.5rem",  "type": "spacing", "mobile": 56 },
+    "16":   { "value": "4rem",    "type": "spacing", "mobile": 64 },
+    "18":   { "value": "4.5rem",  "type": "spacing", "mobile": 72 },
+    "20":   { "value": "5rem",    "type": "spacing", "mobile": 80 },
+    "24":   { "value": "6rem",    "type": "spacing", "mobile": 96 },
+    "28":   { "value": "7rem",    "type": "spacing", "mobile": 112 },
+    "32":   { "value": "8rem",    "type": "spacing", "mobile": 128 },
+    "36":   { "value": "9rem",    "type": "spacing", "mobile": 144 },
+    "40":   { "value": "10rem",   "type": "spacing", "mobile": 160 },
+    "44":   { "value": "11rem",   "type": "spacing", "mobile": 176 },
+    "48":   { "value": "12rem",   "type": "spacing", "mobile": 192 },
+    "52":   { "value": "13rem",   "type": "spacing", "mobile": 208 },
+    "56":   { "value": "14rem",   "type": "spacing", "mobile": 224 },
+    "60":   { "value": "15rem",   "type": "spacing", "mobile": 240 },
+    "64":   { "value": "16rem",   "type": "spacing", "mobile": 256 },
+    "72":   { "value": "18rem",   "type": "spacing", "mobile": 288 },
+    "80":   { "value": "20rem",   "type": "spacing", "mobile": 320 },
+    "96":   { "value": "24rem",   "type": "spacing", "mobile": 384 }
+  },
+
+  "layout": {
+    "section-padding":    { "value": "5rem",   "type": "spacing", "mobile": 80, "description": "Full section vertical padding" },
+    "section-padding-sm": { "value": "3rem",   "type": "spacing", "mobile": 48, "description": "Compact section vertical padding" },
+    "container-padding":  { "value": "1.5rem", "type": "spacing", "mobile": 24, "description": "Horizontal page margin" },
+    "grid-gap":           { "value": "1.5rem", "type": "spacing", "mobile": 24, "description": "Default grid column gap" },
+    "grid-gap-sm":        { "value": "1rem",   "type": "spacing", "mobile": 16, "description": "Compact grid gap" },
+    "grid-gap-lg":        { "value": "2rem",   "type": "spacing", "mobile": 32, "description": "Wide grid gap" }
+  }
+}

@@ -1,0 +1,39 @@
+# Build directories
+.next/
+.next/**
+.open-next/
+.open-next/**
+out/
+out/**
+build/
+build/**
+dist/
+dist/**
+
+# Dependencies
+node_modules/
+node_modules/**
+
+# Generated files
+*.d.ts
+**/*.js.map
+**/*.d.ts.map
+*.tsbuildinfo
+
+# Config files that don't need linting
+next.config.js
+jest.config.js
+tailwind.config.js
+
+# Coverage and test outputs
+coverage/
+coverage/**
+.nyc_output/
+
+# Sentry config files (auto-generated)
+sentry.client.config.ts
+sentry.server.config.ts
+
+# Cache directories
+.eslintcache
+.cache/

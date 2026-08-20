@@ -1,0 +1,50 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "name": "GatherGrove Breakpoint Tokens",
+  "description": "Screen size breakpoints. Web values match Tailwind config. Mobile values are numeric px for React Native dimensions.",
+
+  "breakpoint": {
+    "xs": {
+      "value": "475px",
+      "type": "dimension",
+      "mobile": 320,
+      "platforms": ["web"],
+      "description": "Extra small — 475px (web) / 320px (mobile xs phone)"
+    },
+    "sm": {
+      "value": "640px",
+      "type": "dimension",
+      "mobile": 375,
+      "platforms": ["web", "mobile"],
+      "description": "Small — 640px (web) / 375px (mobile standard phone)"
+    },
+    "md": {
+      "value": "768px",
+      "type": "dimension",
+      "mobile": 414,
+      "platforms": ["web", "mobile"],
+      "description": "Medium — 768px (web tablet) / 414px (mobile large phone)"
+    },
+    "lg": {
+      "value": "1024px",
+      "type": "dimension",
+      "mobile": 768,
+      "platforms": ["web", "mobile"],
+      "description": "Large — 1024px (web laptop) / 768px (mobile tablet)"
+    },
+    "xl": {
+      "value": "1280px",
+      "type": "dimension",
+      "mobile": 1024,
+      "platforms": ["web", "mobile"],
+      "description": "Extra large — 1280px (web desktop) / 1024px (mobile large tablet)"
+    },
+    "2xl": {
+      "value": "1536px",
+      "type": "dimension",
+      "mobile": 1280,
+      "platforms": ["web"],
+      "description": "2XL — 1536px (web large desktop)"
+    }
+  }
+}

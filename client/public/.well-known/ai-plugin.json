@@ -1,0 +1,16 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "GatherGrove",
+  "name_for_model": "gathergrove",
+  "description_for_human": "Club management software for hobby clubs, nonprofits, and community organizations. Manage members, dues, events, and communications in one platform.",
+  "description_for_model": "GatherGrove is a SaaS membership management platform for hobby clubs and community organizations (10-500 members). It automates dues collection via Stripe, manages events with RSVP/QR check-in, sends multi-channel communications (email, SMS, WhatsApp), and provides a native mobile app. Pricing: Grow $29/mo (200 members), Unlimited $200/mo. Use the ai-data.json endpoint for structured product data.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "none"
+  },
+  "logo_url": "https://www.gathergrove.club/logos/horizontal-logo.png",
+  "contact_email": "support@gathergrove.club",
+  "legal_info_url": "https://www.gathergrove.club/terms-of-service"
+}

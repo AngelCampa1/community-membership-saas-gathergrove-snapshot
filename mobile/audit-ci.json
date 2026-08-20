@@ -1,0 +1,14 @@
+{
+  "moderate": true,
+  "high": true,
+  "critical": true,
+  "allowlist": [
+    
+  ],
+  "report-type": "summary",
+  "retry": {
+    "count": 3,
+    "factor": 2
+  },
+  "output-format": "text"
+}

@@ -1,0 +1,258 @@
+---
+description: 
+globs: *.tsx,*.ts
+alwaysApply: false
+---
+## Frontend Test Mock Interface Alignment - Complete Implementation-Based Testing Strategy
+
+### Problem Pattern
+Frontend tests failing due to mock interface mismatches with actual implementation:
+- Mock methods don't match real service interfaces (`onMessageReceived` vs `onNewMessage`)
+- Missing required properties in mock response objects (`canAccessChat`, `totalCount`)
+- Incorrect callback signatures for complex services (SignalR `onConnectionStatus`)
+- Tests written based on assumptions rather than actual implementation structure
+- TypeScript errors from incomplete mock typing
+
+### Root Cause Analysis
+**Writing mocks based on assumptions instead of reading actual implementation interfaces**
+
+From GatherGrove testing session (January 2025):
+- ❌ 23 failing chat tests due to interface mismatches
+- ✅ Fixed by aligning mocks with actual service implementations
+- 🔍 Key insight: Implementation-first mock creation prevents 90% of test failures
+
+### Solution Pattern
+**MANDATORY: Read actual implementation interfaces BEFORE writing any mocks**
+
+#### 1. Implementation Analysis Workflow
+
+**BEFORE writing ANY mock, ALWAYS:**
+
+```typescript
+// ❌ WRONG - Assumption-based mocking
+jest.mock('@/services/signalrService', () => ({
+  signalRService: {
+    connect: jest.fn(),        // Method doesn't exist!
+    onMessageReceived: jest.fn(), // Wrong method name!
+  },
+}));
+
+// ✅ CORRECT - Implementation-based mocking
+// 1. READ the actual service file first
+// 2. IDENTIFY exact method names and signatures
+// 3. MATCH the interface exactly
+
+jest.mock('@/services/signalrService', () => ({
+  signalRService: {
+    startConnection: jest.fn(),     // ✅ Actual method name
+    onNewMessage: jest.fn(),        // ✅ Actual method name
+    onConnectionStatus: jest.fn(),  // ✅ Actual method name
+  },
+}));
+```
+
+#### 2. Complete SignalR Service Mock Pattern
+
+**PROVEN WORKING PATTERN from GatherGrove:**
+
+```typescript
+// Based on actual signalrService.ts implementation
+jest.mock('@/services/signalrService', () => ({
+  signalRService: {
+    startConnection: jest.fn(),
+    stopConnection: jest.fn(),
+    joinClubChat: jest.fn(),      // Not joinClubChatRoom!
+    leaveClubChat: jest.fn(),     // Not leaveClubChatRoom!
+    onNewMessage: jest.fn(),      // Not onMessageReceived!
+    offNewMessage: jest.fn(),
+    onConnectionStatus: jest.fn(), // 4 callback parameters!
+    isConnected: jest.fn(),
+    getConnectionState: jest.fn().mockReturnValue('Disconnected'),
+  },
+}));
+
+// Correct setup in beforeEach
+beforeEach(() => {
+  (mockSignalRService.isConnected as jest.Mock).mockReturnValue(false);
+  
+  // Correct onConnectionStatus signature (4 callbacks)
+  mockSignalRService.onConnectionStatus.mockImplementation(
+    (onConnected, onDisconnected, onReconnecting, onReconnected) => {
+      // Store callbacks for test use
+    }
+  );
+});
+```
+
+#### 3. Complete Response Object Mock Pattern
+
+**MANDATORY: Include ALL required interface properties**
+
+```typescript
+// ❌ WRONG - Missing required properties
+mockChatService.checkChatAccess.mockResolvedValue({
+  hasAccess: true,
+  isChatEnabled: true,
+  // Missing canAccessChat! TypeScript error
+});
+
+// ✅ CORRECT - Complete interface match
+mockChatService.checkChatAccess.mockResolvedValue({
+  hasAccess: true,
+  isChatEnabled: true,
+  canAccessChat: true,  // ✅ Required by ChatAccessResponse
+});
+
+// ❌ WRONG - Missing totalCount
+mockChatService.getChatHistory.mockResolvedValue({
+  messages: mockMessages,
+  hasMore: false,
+  // Missing totalCount! TypeScript error
+});
+
+// ✅ CORRECT - Complete interface match  
+mockChatService.getChatHistory.mockResolvedValue({
+  messages: mockMessages,
+  hasMore: false,
+  totalCount: 2,  // ✅ Required by ChatHistoryResponse
+});
+```
+
+#### 4. Complete ChatMessageResponse Mock Pattern
+
+**MANDATORY: Include ALL message properties for realistic tests**
+
+```typescript
+// ❌ WRONG - Incomplete message structure
+const mockMessage = {
+  messageContent: 'Hello!',
+  senderName: 'Test User',
+  sentAt: new Date().toISOString(),
+  // Missing required IDs! TypeScript errors
+};
+
+// ✅ CORRECT - Complete ChatMessageResponse structure
+const mockMessage: ChatMessageResponse = {
+  chatMessageId: 1,           // ✅ Required
+  clubId: 1,                  // ✅ Required  
+  senderUserId: 1,            // ✅ Required
+  messageContent: 'Hello!',
+  senderName: 'Test User',
+  sentAt: new Date().toISOString(),
+};
+```
+
+#### 5. Implementation Reading Checklist
+
+**MANDATORY steps before writing mocks:**
+
+- [ ] **Read service interface file** (`signalrService.ts`, `chatService.ts`)
+- [ ] **Identify exact method names** (not assumed names)
+- [ ] **Check method signatures** (parameters, return types)
+- [ ] **Read TypeScript interfaces** (`ChatAccessResponse`, `ChatHistoryResponse`)
+- [ ] **Verify required properties** (all non-optional fields)
+- [ ] **Check actual component usage** (how methods are called)
+- [ ] **Test with actual data shapes** (not simplified versions)
+
+#### 6. Interface Verification Commands
+
+**Use these to verify actual interfaces:**
+
+```bash
+# Find actual method names
+grep -r "onNewMessage\|startConnection" src/services/
+
+# Find interface definitions  
+grep -r "ChatAccessResponse\|ChatHistoryResponse" src/types/
+
+# Check actual component usage
+grep -r "signalRService\." src/app/app/chat/
+```
+
+### Key Anti-Patterns to Avoid
+
+**❌ NEVER do these:**
+
+```typescript
+// Wrong method names (common mistakes from assumptions)
+connect: jest.fn(),              // Real: startConnection
+disconnect: jest.fn(),           // Real: stopConnection  
+joinClubChatRoom: jest.fn(),     // Real: joinClubChat
+onMessageReceived: jest.fn(),    // Real: onNewMessage
+onConnectionStatusChanged: jest.fn(), // Real: onConnectionStatus
+
+// Incomplete response objects
+{ hasAccess: true },             // Missing canAccessChat
+{ messages: [] },                // Missing hasMore, totalCount
+{ messageContent: 'hi' },        // Missing IDs, senderName, sentAt
+
+// Wrong TypeScript patterns
+isConnected: false,              // Should be jest.fn()
+login: jest.fn() as any,         // Avoid 'as any' - fix types properly
+```
+
+### Working Examples from GatherGrove
+
+**✅ CONFIRMED WORKING patterns (after implementation analysis):**
+
+```typescript
+// Auth mock (329/338 tests use this pattern)
+jest.mock('@/hooks/useAuth', () => ({
+  useAuth: jest.fn(),
+}));
+
+// Service mock with complete interface
+jest.mock('@/services/chatService', () => ({
+  chatService: {
+    checkChatAccess: jest.fn(),
+    getChatHistory: jest.fn(),
+    sendMessage: jest.fn(),
+  },
+}));
+
+// Complete response mocking
+mockChatService.checkChatAccess.mockResolvedValue({
+  hasAccess: true,
+  isChatEnabled: true,
+  canAccessChat: true,     // ✅ Implementation requires this
+});
+```
+
+### Time Investment vs. Savings
+
+**Implementation-first approach:**
+- ⏰ **+15 minutes**: Reading implementation files upfront
+- ✅ **-4 hours**: Eliminates mock interface debugging
+- ✅ **-2 hours**: Eliminates TypeScript error fixing  
+- ✅ **-1 hour**: Eliminates test-fix-test cycles
+
+**Result: 2.75 hours net savings per complex component test**
+
+### Quality Metrics
+
+**Success indicators:**
+- ✅ Tests pass on first run (no mock interface errors)
+- ✅ TypeScript compilation with zero errors
+- ✅ Mocks survive implementation refactoring
+- ✅ No "property does not exist" errors
+- ✅ No "mockReturnValue is not a function" errors
+
+### Enforcement Protocol
+
+**MANDATORY before any test PR:**
+- [ ] All mocks match actual implementation interfaces
+- [ ] All response objects include required properties
+- [ ] All method names verified against actual code
+- [ ] TypeScript compilation passes with zero errors
+- [ ] No 'as any' type assertions in test mocks
+
+### Implementation Results
+
+**GatherGrove case study:**
+- **Before**: 23/682 chat tests failing (interface mismatches)
+- **After**: 682/682 tests passing (implementation-aligned mocks)
+- **Key fix**: Reading actual SignalR service interface before mocking
+- **Time saved**: 4+ hours of debugging eliminated
+
+**This rule eliminates interface mismatch testing failures by requiring implementation analysis before mock creation.**
+

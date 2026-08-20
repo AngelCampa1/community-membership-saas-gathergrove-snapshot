@@ -1,0 +1,201 @@
+# Cursor AI Rules for GatherGrove Project
+
+## Port Configuration
+
+GatherGrove uses the following ports to avoid conflicts with other projects:
+- Backend API: 8050 (HTTP) / 7050 (HTTPS)
+- Frontend Client: 3050
+- Mobile App: 5080
+- PostgreSQL: 9050
+
+### Port Allocation
+
+Ports are allocated in a 50-block so GatherGrove can run alongside other local projects:
+
+| Project     | Backend | Frontend | Mobile | Database |
+|-------------|---------|----------|--------|----------|
+| GatherGrove | 8050    | 3050     | 5080   | 9050     |
+
+## Development Environment
+
+- **OS**: Windows 10/11
+- **Database**: PostgreSQL (Docker)
+- **Backend**: .NET 9.0 API with Clean Architecture
+- **Frontend**: Next.js 15 with TypeScript (React 19)
+- **Mobile**: React Native
+
+## Test-Driven Development (TDD)
+
+**GatherGrove follows Test-Driven Development methodology with Red-Green-Refactor cycles.**
+
+### TDD Workflow
+1. **Red**: Write a failing test first
+2. **Green**: Write minimal code to make the test pass
+3. **Refactor**: Clean up code while keeping tests green
+4. **Repeat**: Continue for each new requirement
+
+### Test Coverage Requirements (targets, currently unmet)
+- **Backend**: target >95% coverage; actual is 42.6% across 6,213 tests
+- **Frontend**: target >95% coverage; actual is 63.2% across 11,055 tests
+- **Critical Paths**: 100% coverage REQUIRED
+- **Integration Tests**: All API endpoints and SignalR hubs tested
+
+### Critical Flow Testing (TDD Priority)
+Write tests FIRST for:
+- **Payment Processing**: Stripe integration, payment status, subscriptions
+- **Event Management**: Paid events, registration, waitlists, QR codes
+- **Real-time Features**: SignalR hubs (chat, events, analytics)
+- **Security**: Authentication, authorization, rate limiting
+- **Communications**: Email templates, A/B testing, automation
+- **Multi-location**: Location management, member transfers
+
+## Definition of Done
+
+**REQUIRED** for any user story to be considered finished:
+
+### ✅ **All Tests Must Pass**
+- Backend Tests: `dotnet test` must show 0 failures (6,213 tests, 20 skipped)
+- Frontend Tests: `npm test` must show 0 failures (11,055 tests, 121 skipped)
+- Integration Tests: All API endpoints respond correctly
+- SignalR Tests: All real-time features functioning
+
+### ✅ **Zero Linter Errors**
+- Frontend: `npm run lint` must output 0 errors
+- Backend: `dotnet build` must show 0 errors (warnings acceptable)
+- Type Checking: TypeScript strict mode compilation successful
+
+### ✅ **Build Success**
+- Backend: `dotnet build` must succeed
+- Frontend: `npm run build` must succeed
+
+### ✅ **Code Committed and Pushed**
+- Commit ALL related changes together (check `git status`)
+- Descriptive commit message following project conventions
+- Push to remote repository
+- Include footer: `🤖 Generated with [Claude Code](https://claude.com/claude-code)`
+
+**NO EXCEPTIONS**: A user story is NOT complete until ALL criteria are met.
+
+## Development Commands
+
+### Start Backend
+```powershell
+cd backend
+dotnet run
+```
+Access: http://localhost:8050/swagger
+
+### Start Frontend
+```powershell
+cd client
+npm run dev
+```
+Access: http://localhost:3050
+
+### Database Commands
+```powershell
+# Apply migrations
+cd backend
+dotnet ef database update
+
+# Create new migration
+dotnet ef migrations add MigrationName
+
+# Reset database
+dotnet ef database drop --force
+dotnet ef database update
+```
+
+### Testing - TDD Mode
+
+#### Backend Tests (TDD Cycle)
+```powershell
+# Continuous testing for TDD
+cd backend
+dotnet test --watch
+
+# Run all tests with coverage
+dotnet test --collect:"XPlat Code Coverage"
+```
+
+#### Frontend Tests (TDD Cycle)
+```powershell
+# Continuous testing for TDD
+cd client
+npm test --watch
+
+# Run all tests with coverage
+npm test --coverage
+```
+
+## Code Conventions
+
+### Backend (.NET 9.0)
+- Clean Architecture (Domain → Application → Infrastructure → API)
+- Async/await for all I/O operations
+- Entity Framework Core with PostgreSQL 16 (Docker)
+- TDD-first for all business logic
+- SignalR for real-time features
+
+### Frontend (Next.js 15 + React 19)
+- TypeScript strict mode
+- Tailwind CSS with Radix UI components
+- TanStack Query for server state management
+- TDD-first for all components and features
+- Comprehensive security headers (CSP, XSS protection)
+
+## Key Features
+
+### Payment System
+- Stripe integration with webhooks
+- Event payment links
+- Member vs non-member pricing
+- Payment status tracking
+- Subscription management
+
+### Real-time Features
+- ChatHub for messaging
+- EventEngagementHub for live updates
+- AnalyticsHub for real-time metrics
+
+### Communications
+- Email templates with A/B testing
+- Email delivery via Resend
+- Workflow automation
+- Analytics and engagement tracking
+
+### Event Management
+- Multi-session events
+- Waitlist management
+- QR code check-in
+- Feedback collection
+- Advanced analytics
+
+## AI Assistant Guidelines
+
+When helping with this project:
+1. **Follow TDD**: Write tests FIRST for all features and bug fixes
+2. **Test Coverage**: >95% is the stated target; measured coverage is 42.6% backend / 63.2% frontend
+3. Always use port 8050 for backend, 3050 for frontend, 5080 for mobile
+4. Use PowerShell commands on Windows
+5. PostgreSQL 16 via `docker compose up -d postgres` for local development
+6. Check CLAUDE.md for comprehensive documentation
+7. Commit and push ALL changes when completing a task
+8. When testing with Playwright MCP, test manually (don't write automated tests)
+9. Close all servers and tools after testing
+
+## Documentation References
+
+- `CLAUDE.md` - Complete development guide
+- `backend/README.md` - Backend architecture details
+- `client/README.md` - Frontend setup and structure
+- API Docs: http://localhost:8050/swagger
+
+## Security Requirements
+
+- JWT authentication with role-based authorization
+- Comprehensive CSP headers
+- XSS protection
+- Rate limiting on all endpoints
+- Secure payment processing with Stripe
+- Audit logging for all critical operations

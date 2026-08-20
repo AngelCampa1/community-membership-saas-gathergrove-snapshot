@@ -1,0 +1,38 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": ["ES2020", "dom"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "typeRoots": ["./node_modules/@types", "../client/node_modules/@types"],
+    "types": ["jest", "node", "supertest"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["../client/src/*"],
+      "@/services/*": ["../client/src/services/*"],
+      "@/types/*": ["../client/src/types/*"],
+      "@/lib/*": ["../client/src/lib/*"],
+      "@/hooks/*": ["../client/src/hooks/*"],
+      "@/components/*": ["../client/src/components/*"]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.js",
+    "../client/src/**/*.ts",
+    "../client/src/**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build"
+  ]
+}

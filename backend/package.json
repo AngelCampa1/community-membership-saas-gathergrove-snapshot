@@ -1,0 +1,53 @@
+{
+  "name": "gathergrove-backend",
+  "version": "1.0.0",
+  "description": "GatherGrove Backend API - .NET Core 9.0 Web API",
+  "scripts": {
+    "build": "dotnet build --configuration Release",
+    "build:debug": "dotnet build --configuration Debug",
+    "clean": "dotnet clean",
+    "restore": "dotnet restore",
+    "test": "dotnet test --verbosity normal",
+    "test:coverage": "dotnet test --collect:\"XPlat Code Coverage\" --verbosity normal",
+    "start": "dotnet run --project src/GatherGrove.API --configuration Debug",
+    "start:prod": "dotnet run --project src/GatherGrove.API --configuration Release",
+    "dev": "dotnet watch --project src/GatherGrove.API run",
+    "publish": "dotnet publish src/GatherGrove.API --configuration Release --output ./publish",
+    "migrations:add": "dotnet ef migrations add",
+    "migrations:update": "dotnet ef database update",
+    "migrations:remove": "dotnet ef migrations remove",
+    "docker:build": "docker build -t gathergrove-api .",
+    "docker:run": "docker run -p 5284:8080 gathergrove-api",
+    "health": "curl -f http://localhost:5284/health || exit 1",
+    "lint": "echo 'Linting not configured for .NET projects - use IDE analysis'",
+    "format": "dotnet format",
+    "prebuild": "dotnet restore",
+    "postinstall": "dotnet restore"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "engines": {
+    "dotnet": ">=9.0.0"
+  },
+  "keywords": [
+    "dotnet",
+    "asp.net-core",
+    "web-api",
+    "entity-framework",
+    "jwt",
+    "signalr",
+    "azure",
+    "gathergrove"
+  ],
+  "author": "GatherGrove Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gathergrove/gathergrove.git",
+    "directory": "backend"
+  },
+  "config": {
+    "dotnet_version": "9.0",
+    "aspnet_environment": "Development"
+  }
+}

@@ -1,0 +1,6 @@
+---
+description: 
+globs: *.cs
+alwaysApply: false
+---
+When a user story implies data entities, define or update the C# EF Core entity classes (e.g., Club, User, Member, MembershipType, Payment, Event) and ensure DbSet<> entries exist in the GatherGroveDbContext. Configure primary keys as integer identity columns (INT IDENTITY(1,1)), properties (types, nullability), foreign keys (e.g., Member.ClubId), and unique constraints (e.g., for a user's email) using Fluent API in OnModelCreating before generating the related API.

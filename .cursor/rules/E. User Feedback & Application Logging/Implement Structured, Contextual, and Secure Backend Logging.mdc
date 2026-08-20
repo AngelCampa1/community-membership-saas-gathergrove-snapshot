@@ -1,0 +1,6 @@
+---
+description: 
+globs: *.cs
+alwaysApply: false
+---
+All backend logs MUST be structured (JSON) via ILogger<T>. Each entry MUST include: Timestamp (UTC), LogLevel, CorrelationID, and relevant event-specific structured data (e.g., ClubId, MemberId, EventId). NEVER log sensitive PII like passwords or full payment details.

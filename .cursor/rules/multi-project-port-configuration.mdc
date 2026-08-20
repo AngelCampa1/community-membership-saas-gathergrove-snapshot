@@ -1,0 +1,198 @@
+## Multi-Project Port Configuration Protocol
+
+### Problem Pattern
+Multiple projects running simultaneously on the same development machine cause port conflicts, leading to:
+- Services failing to start due to "address already in use" errors
+- Confusion about which project is running on which port
+- Time wasted troubleshooting port conflicts
+- Accidental connections to wrong project backends
+
+### Solution Pattern
+**MANDATORY: Use standardized port assignments across all projects to avoid conflicts**
+
+### Port Assignment Schema
+
+Each project follows a consistent pattern:
+- **Backend**: `80X0` (X = project number 1-6)
+- **Client**: `30X0` (X = project number 1-6)
+- **Mobile**: `50X0 + offset` (varies by project)
+- **SQL Server**: `90X0` (X = project number 1-6)
+
+### Complete Port Assignments
+
+| Project | Backend | Client | Mobile | SQL Server |
+|---------|---------|--------|--------|------------|
+| 1. Serelo | 8010 | 3010 | 5060 | 9010 |
+| 2. GeoLeap | 8020 | 3020 | 5070 | 9020 |
+| 3. SkillLedger | 8030 | 3030 | N/A | 9030 |
+| 4. AvailLegal | 8040 | 3040 | N/A | 9040 |
+| 5. GatherGrove | 8050 | 3050 | 5080 | 9050 |
+| 6. ClassicGames | 8060 | 3060 | 5090 | 9060 |
+
+### GatherGrove Configuration Files
+
+**MANDATORY: Verify these files have correct ports before starting development**
+
+#### Backend (Port 8050)
+1. **`backend/src/GatherGrove.API/Properties/launchSettings.json`**
+   ```json
+   {
+     "profiles": {
+       "http": {
+         "applicationUrl": "http://0.0.0.0:8050"
+       }
+     }
+   }
+   ```
+
+2. **`backend/src/GatherGrove.API/appsettings.Development.json`**
+   ```json
+   {
+     "App": {
+       "ApiUrl": "http://localhost:8050",
+       "FrontendUrl": "http://localhost:3050"
+     }
+   }
+   ```
+
+3. **`backend/src/GatherGrove.API/Program.cs`**
+   ```csharp
+   // Reads from appsettings.Development.json App:ApiUrl
+   var apiUrl = builder.Configuration["App:ApiUrl"] ?? "http://localhost:8050";
+   ```
+
+#### Frontend (Port 3050)
+1. **`client/package.json`**
+   ```json
+   {
+     "scripts": {
+       "dev": "next dev -p 3050"
+     }
+   }
+   ```
+
+2. **`client/.env.local`**
+   ```env
+   NEXT_PUBLIC_API_URL=http://localhost:8050
+   NEXT_PUBLIC_APP_URL=http://localhost:3050
+   NEXT_PUBLIC_SIGNALR_HUB_URL=http://localhost:8050/hubs/chat
+   ```
+
+3. **`client/.env.example`**
+   ```env
+   NEXT_PUBLIC_API_BASE_URL=http://localhost:8050/api/v1
+   ```
+
+#### Mobile (Port 5080)
+1. **`mobile/metro.config.js`**
+   ```javascript
+   config.server = {
+     port: 5080,
+   };
+   ```
+
+#### SQL Server (Port 9050)
+1. **`docker-compose.yml`**
+   ```yaml
+   services:
+     sqlserver:
+       ports:
+         - "9050:1433"
+   ```
+
+### Starting GatherGrove Services
+
+**MANDATORY: Start services in this order**
+
+```powershell
+# 1. Start SQL Server (Docker) on port 9050
+docker-compose up -d
+
+# 2. Start Backend (.NET API on port 8050)
+cd backend
+dotnet run --project src/GatherGrove.API
+
+# 3. Start Frontend (Next.js on port 3050) - New terminal
+cd client
+yarn dev
+
+# 4. Start Mobile (React Native on port 5080) - Optional, new terminal
+cd mobile
+npm start
+```
+
+### Accessing GatherGrove Services
+
+- **Frontend**: http://localhost:3050
+- **Backend API**: http://localhost:8050
+- **Backend Swagger**: http://localhost:8050/swagger
+- **Mobile**: http://localhost:5080
+- **SQL Server**: `localhost,9050`
+
+### Port Conflict Detection
+
+**Check if ports are in use before starting:**
+
+```powershell
+# Windows PowerShell
+netstat -ano | findstr ":8050"  # Backend
+netstat -ano | findstr ":3050"  # Client
+netstat -ano | findstr ":5080"  # Mobile
+netstat -ano | findstr ":9050"  # SQL Server
+```
+
+### Port Configuration Verification Checklist
+
+**Before starting development, verify:**
+- [ ] `backend/src/GatherGrove.API/Properties/launchSettings.json` uses port 8050
+- [ ] `backend/src/GatherGrove.API/appsettings.Development.json` has ApiUrl with 8050
+- [ ] `client/package.json` dev script uses `-p 3050`
+- [ ] `client/.env.local` has correct API URL (8050) and App URL (3050)
+- [ ] `mobile/metro.config.js` uses port 5080
+- [ ] `docker-compose.yml` maps SQL Server to 9050
+
+### Playwright E2E Testing Configuration
+
+**When using Playwright MCP for E2E testing:**
+
+```typescript
+// Navigate to GatherGrove frontend
+await page.goto('http://localhost:3050');
+
+// API calls will go to backend on port 8050
+// Frontend is configured to proxy to http://localhost:8050
+```
+
+### Prevention Protocol
+
+1. **Always check CLAUDE.md** before starting services to verify current project's ports
+2. **Never hardcode ports** - always use configuration files
+3. **Document port changes** in commit messages if modified
+4. **Update all configuration files** consistently when changing ports
+5. **Create port configuration rule** if pattern emerges across projects
+
+### Benefits
+
+**Development Benefits:**
+- ✅ No port conflicts across multiple projects
+- ✅ Clear service identification by port number
+- ✅ Consistent configuration patterns
+- ✅ Fast switching between projects
+
+**Team Benefits:**
+- ✅ Standardized port assignments across team
+- ✅ Reduced setup time for new developers
+- ✅ Clear documentation of service locations
+- ✅ Easier debugging with predictable ports
+
+### Meta-Learning
+
+**"Port conflicts waste time - standardization saves hours"**
+
+This rule ensures:
+- ✅ Multiple projects can run simultaneously without conflicts
+- ✅ Port assignments are predictable and documented
+- ✅ Configuration files are consistent across projects
+- ✅ E2E testing uses correct service endpoints
+
+**This protocol eliminates port conflict issues and enables efficient multi-project development.**

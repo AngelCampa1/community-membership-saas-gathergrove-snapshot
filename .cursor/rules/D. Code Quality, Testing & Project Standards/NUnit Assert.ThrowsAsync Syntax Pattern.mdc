@@ -1,0 +1,74 @@
+---
+description: 
+globs: *.cs
+alwaysApply: false
+---
+## NUnit Assert.ThrowsAsync Syntax Pattern - Avoiding Compilation Errors
+
+### Problem Pattern
+**Assert.ThrowsAsync compilation errors occur when using incorrect async/await syntax:**
+- Error: `'InvalidOperationException' does not contain a definition for 'GetAwaiter'`
+- Symptom: Tests fail to compile with GetAwaiter errors on exception types
+- Root Cause: Incorrectly using `await` before `Assert.ThrowsAsync` and `async` lambdas
+
+### Solution Pattern
+**Use the correct NUnit Assert.ThrowsAsync syntax without await/async:**
+
+```csharp
+// ✅ CORRECT - No await, regular lambda
+var exception = Assert.ThrowsAsync<InvalidOperationException>(
+    () => _service.MethodThatThrows(parameter));
+
+Assert.That(exception.Message, Does.Contain("Expected error message"));
+```
+
+### Common Mistakes to Avoid
+
+```csharp
+// ❌ WRONG - Using await before Assert.ThrowsAsync
+var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () => 
+    await _service.MethodThatThrows(parameter));
+
+// ❌ WRONG - Using async lambda
+var exception = Assert.ThrowsAsync<InvalidOperationException>(async () => 
+    await _service.MethodThatThrows(parameter));
+
+// ❌ WRONG - Using FluentAssertions Should() syntax
+exception.Message.Should().Contain("error message");
+```
+
+### Implementation Rules
+
+1. **Never use `await` before `Assert.ThrowsAsync`**
+2. **Use regular lambda `() =>` not `async () =>`**
+3. **No `await` inside the lambda**
+4. **Use `Assert.That()` with `Does.Contain()` for message checking**
+5. **Follow the existing codebase pattern from other service tests**
+
+### Examples from GatherGrove Codebase
+
+**Correct patterns found in BillingServiceTests.cs:**
+```csharp
+var ex = Assert.ThrowsAsync<ArgumentException>(
+    () => _billingService.GetBillingStatusAsync(nonExistentClubId));
+
+Assert.That(ex.Message, Does.Contain("Club not found"));
+```
+
+**Fixed AdminServiceTests.cs pattern:**
+```csharp
+var exception = Assert.ThrowsAsync<InvalidOperationException>(
+    () => _adminService.CreateAdminInviteAsync(1, 1, request));
+
+Assert.That(exception.Message, Does.Contain("Admin invitations are only available"));
+```
+
+### Prevention
+- **Always check existing test files** for Assert.ThrowsAsync patterns before writing new ones
+- **Look for similar tests** in the same codebase (BillingServiceTests, AuthServiceTests, etc.)
+- **Verify compilation immediately** after writing exception tests
+- **Use consistent assertion syntax** (Assert.That + Does.Contain vs FluentAssertions)
+
+### Time Saved
+This pattern prevents 20+ minute debugging sessions trying to fix "GetAwaiter" compilation errors on exception types.
+

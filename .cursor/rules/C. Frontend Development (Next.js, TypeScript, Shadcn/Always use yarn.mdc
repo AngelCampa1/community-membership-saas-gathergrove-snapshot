@@ -1,0 +1,6 @@
+---
+description: 
+globs: *.tsx,*.ts,*.js
+alwaysApply: false
+---
+Always use yarn for the frontend.

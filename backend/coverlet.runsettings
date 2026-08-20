@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<RunSettings>
+  <RunConfiguration>
+    <MaxCpuCount>0</MaxCpuCount>
+    <ResultsDirectory>.\TestResults</ResultsDirectory>
+    <TestSessionTimeout>600000</TestSessionTimeout>
+    <DisableAppDomain>true</DisableAppDomain>
+    <DisableParallelization>false</DisableParallelization>
+  </RunConfiguration>
+  <NUnit>
+    <NumberOfTestWorkers>8</NumberOfTestWorkers>
+    <DefaultTestNamePattern>{m}{a}</DefaultTestNamePattern>
+    <DomainUsage>None</DomainUsage>
+    <ShadowCopyFiles>false</ShadowCopyFiles>
+    <DefaultTimeout>30000</DefaultTimeout>
+  </NUnit>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat code coverage">
+        <Configuration>
+          <Exclude>
+            <!-- Exclude migrations -->
+            [*]*Migrations*
+            [*]*Migration*
+            [*]*ModelSnapshot*
+            
+            <!-- Exclude generated files -->
+            [*]*Designer*
+            [*]*AssemblyInfo*
+            
+            <!-- Exclude specific files by full name -->
+            [GatherGrove.Infrastructure]*Migrations.*
+            [GatherGrove.Infrastructure]*InitialCreate*
+            [GatherGrove.Infrastructure]*GatherGroveDbContextModelSnapshot*
+          </Exclude>
+          
+          <!-- Include specific assemblies -->
+          <Include>
+            [GatherGrove.API]*
+            [GatherGrove.Application]*
+            [GatherGrove.Domain]*
+            [GatherGrove.Infrastructure]*
+          </Include>
+          
+          <!-- Exclude by attributes -->
+          <ExcludeByAttribute>
+            <Attribute>System.Diagnostics.DebuggerNonUserCodeAttribute</Attribute>
+            <Attribute>System.Runtime.CompilerServices.CompilerGeneratedAttribute</Attribute>
+            <Attribute>System.CodeDom.Compiler.GeneratedCodeAttribute</Attribute>
+            <Attribute>System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute</Attribute>
+          </ExcludeByAttribute>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings> 

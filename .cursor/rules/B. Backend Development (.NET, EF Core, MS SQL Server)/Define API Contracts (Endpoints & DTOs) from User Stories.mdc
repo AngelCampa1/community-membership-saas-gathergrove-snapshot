@@ -1,0 +1,6 @@
+---
+description: 
+globs: *.cs
+alwaysApply: false
+---
+Define API endpoints and dedicated C# DTO classes for request/response bodies based on the user story's "API Endpoint" section (e.g., CreateMemberRequest, MemberResponse). Do NOT use EF Core entities directly in API signatures. Adhere to RESTful principles and the established /api/v1/... route structure.

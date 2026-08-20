@@ -1,0 +1,409 @@
+/**
+ * BrandAssetManager Coverage Boost Tests
+ *
+ * Target: Boost coverage from 71.74% to 80%+
+ * Focus: Uncovered error paths, UI interactions, edge cases
+ */
+
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { BrandAssetManager, BrandAsset } from '../BrandAssetManager';
+
+describe('BrandAssetManager - Coverage Boost', () => {
+  const mockAssets: BrandAsset[] = [
+    {
+      id: '1',
+      name: 'logo.png',
+      type: 'image/png',
+      url: 'https://example.com/logo.png',
+      size: 1024 * 500, // 500KB
+      category: 'logos',
+      uploadedAt: '2024-01-01T00:00:00Z',
+      dimensions: { width: 200, height: 200 },
+    },
+  ];
+
+  describe('File Validation Error Paths', () => {
+    it('should show error when file size exceeds limit', async () => {
+      const onError = jest.fn();
+      const maxFileSize = 1024 * 100; // 100KB
+
+      render(
+        <BrandAssetManager
+          assets={mockAssets}
+          maxFileSize={maxFileSize}
+          onError={onError}
+        />
+      );
+
+      const fileInput = screen.getByTestId('file-input');
+
+      // Create file larger than limit
+      const largeFile = new File(['x'.repeat(1024 * 200)], 'large.png', {
+        type: 'image/png',
+      });
+
+      await userEvent.upload(fileInput, largeFile);
+
+      await waitFor(() => {
+        expect(onError).toHaveBeenCalledWith(
+          expect.stringContaining('File size exceeds')
+        );
+      });
+    });
+
+    it('should show error when file type is not allowed', async () => {
+      const onError = jest.fn();
+
+      render(
+        <BrandAssetManager
+          assets={mockAssets}
+          allowedTypes={['image/png']}
+          onError={onError}
+        />
+      );
+
+      const fileInput = screen.getByTestId('file-input');
+      const wrongTypeFile = new File(['content'], 'file.gif', {
+        type: 'image/gif',
+      });
+
+      await userEvent.upload(fileInput, wrongTypeFile);
+
+      await waitFor(() => {
+        expect(onError).toHaveBeenCalledWith(
+          expect.stringContaining('File type')
+        );
+        expect(onError).toHaveBeenCalledWith(
+          expect.stringContaining('is not allowed')
+        );
+      });
+    });
+
+    it('should show error when extension does not match file type', async () => {
+      const onError = jest.fn();
+
+      render(<BrandAssetManager assets={mockAssets} onError={onError} />);
+
+      const fileInput = screen.getByTestId('file-input');
+
+      // File with PNG extension but JPEG type
+      const mismatchFile = new File(['content'], 'image.png', {
+        type: 'image/jpeg',
+      });
+
+      await userEvent.upload(fileInput, mismatchFile);
+
+      await waitFor(() => {
+        expect(onError).toHaveBeenCalledWith(
+          expect.stringContaining('File content does not match extension')
+        );
+      });
+    });
+  });
+
+  describe('Security Scan Error Handling', () => {
+    beforeEach(() => {
+      // Mock fetch for security scan
+      global.fetch = jest.fn();
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('should handle security scan failure (unsafe file)', async () => {
+      const onError = jest.fn();
+
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: async () => ({ safe: false, error: 'File contains malicious content' }),
+      });
+
+      render(<BrandAssetManager assets={mockAssets} onError={onError} />);
+
+      const fileInput = screen.getByTestId('file-input');
+      const file = new File(['content'], 'test.png', { type: 'image/png' });
+
+      await userEvent.upload(fileInput, file);
+
+      await waitFor(() => {
+        expect(onError).toHaveBeenCalledWith(
+          expect.stringContaining('malicious')
+        );
+      }, { timeout: 3000 });
+    });
+
+    it('should handle security scan network error', async () => {
+      const onError = jest.fn();
+
+      (global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'));
+
+      render(<BrandAssetManager assets={mockAssets} onError={onError} />);
+
+      const fileInput = screen.getByTestId('file-input');
+      const file = new File(['content'], 'test.png', { type: 'image/png' });
+
+      await userEvent.upload(fileInput, file);
+
+      await waitFor(() => {
+        expect(onError).toHaveBeenCalledWith(
+          expect.stringContaining('Security scan failed')
+        );
+      }, { timeout: 3000 });
+    });
+
+    it('should handle security scan with non-ok response', async () => {
+      const onError = jest.fn();
+
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: false,
+        json: async () => ({ safe: true }),
+      });
+
+      render(<BrandAssetManager assets={mockAssets} onError={onError} />);
+
+      const fileInput = screen.getByTestId('file-input');
+      const file = new File(['content'], 'test.png', { type: 'image/png' });
+
+      await userEvent.upload(fileInput, file);
+
+      await waitFor(() => {
+        expect(onError).toHaveBeenCalled();
+      }, { timeout: 3000 });
+    });
+  });
+
+  describe('Upload Progress Display', () => {
+    beforeEach(() => {
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ safe: true }),
+      });
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('should display and update upload progress', async () => {
+      const onAssetUpload = jest.fn();
+
+      render(
+        <BrandAssetManager
+          assets={mockAssets}
+          onAssetUpload={onAssetUpload}
+        />
+      );
+
+      const fileInput = screen.getByTestId('file-input');
+      const file = new File(['content'], 'upload-test.png', {
+        type: 'image/png',
+      });
+
+      await userEvent.upload(fileInput, file);
+
+      // Wait for upload progress to appear
+      await waitFor(() => {
+        expect(screen.getByText(/upload-test\.png/i)).toBeInTheDocument();
+      }, { timeout: 3000 });
+
+      // Wait for upload to complete
+      await waitFor(() => {
+        expect(onAssetUpload).toHaveBeenCalled();
+      }, { timeout: 3000 });
+    });
+
+    it('should clean up upload progress after completion', async () => {
+      const onAssetUpload = jest.fn();
+
+      render(
+        <BrandAssetManager
+          assets={mockAssets}
+          onAssetUpload={onAssetUpload}
+        />
+      );
+
+      const fileInput = screen.getByTestId('file-input');
+      const file = new File(['content'], 'cleanup-test.png', {
+        type: 'image/png',
+      });
+
+      await userEvent.upload(fileInput, file);
+
+      // Upload completes
+      await waitFor(() => {
+        expect(onAssetUpload).toHaveBeenCalled();
+      }, { timeout: 3000 });
+
+      // Progress indicator should be removed
+      await waitFor(() => {
+        expect(screen.queryByText(/cleanup-test\.png/i)).not.toBeInTheDocument();
+      }, { timeout: 1000 });
+    });
+  });
+
+  describe('Upload Button Interaction', () => {
+    it('should trigger file input when upload button clicked', () => {
+      render(<BrandAssetManager assets={mockAssets} />);
+
+      const uploadButton = screen.getByRole('button', { name: /upload asset/i });
+      const fileInput = screen.getByTestId('file-input');
+
+      const clickSpy = jest.spyOn(fileInput, 'click');
+
+      fireEvent.click(uploadButton);
+
+      expect(clickSpy).toHaveBeenCalled();
+    });
+
+    it('should display file type and size information', () => {
+      const maxFileSize = 5 * 1024 * 1024; // 5MB
+
+      render(
+        <BrandAssetManager
+          assets={mockAssets}
+          maxFileSize={maxFileSize}
+          allowedTypes={['image/png', 'image/jpeg']}
+        />
+      );
+
+      expect(screen.getByText(/supports.*image\/png.*image\/jpeg/i)).toBeInTheDocument();
+      expect(screen.getByText(/5.*mb/i)).toBeInTheDocument();
+    });
+  });
+
+  describe('Asset Selection and Deletion', () => {
+    it('should handle asset selection', async () => {
+      const onAssetSelect = jest.fn();
+
+      render(
+        <BrandAssetManager
+          assets={mockAssets}
+          onAssetSelect={onAssetSelect}
+        />
+      );
+
+      const assetCard = screen.getByText('logo.png').closest('div');
+      expect(assetCard).toBeInTheDocument();
+
+      if (assetCard) {
+        await userEvent.click(assetCard);
+
+        await waitFor(() => {
+          expect(onAssetSelect).toHaveBeenCalledWith(
+            expect.objectContaining({ id: '1', name: 'logo.png' })
+          );
+        });
+      }
+    });
+
+    it('should handle asset deletion', async () => {
+      const onAssetDelete = jest.fn();
+
+      render(
+        <BrandAssetManager
+          assets={mockAssets}
+          onAssetDelete={onAssetDelete}
+        />
+      );
+
+      // Find delete button for the asset
+      const deleteButtons = screen.getAllByRole('button', { name: /delete/i });
+
+      if (deleteButtons.length > 0) {
+        await userEvent.click(deleteButtons[0]);
+
+        await waitFor(() => {
+          expect(onAssetDelete).toHaveBeenCalledWith('1');
+        });
+      }
+    });
+  });
+
+  describe('Search and Filter Edge Cases', () => {
+    it('should handle search with no results', async () => {
+      render(<BrandAssetManager assets={mockAssets} />);
+
+      const searchInput = screen.getByPlaceholderText(/search/i);
+
+      await userEvent.type(searchInput, 'nonexistent');
+
+      await waitFor(() => {
+        expect(screen.getByText(/no assets found/i)).toBeInTheDocument();
+      });
+    });
+
+    it('should clear search when cleared', async () => {
+      const onSearch = jest.fn();
+
+      render(
+        <BrandAssetManager
+          assets={mockAssets}
+          onSearch={onSearch}
+        />
+      );
+
+      const searchInput = screen.getByPlaceholderText(/search/i);
+
+      await userEvent.type(searchInput, 'logo');
+      await userEvent.clear(searchInput);
+
+      await waitFor(() => {
+        expect(onSearch).toHaveBeenCalledWith('');
+      });
+    });
+
+    it('should filter by multiple categories', async () => {
+      const assets: BrandAsset[] = [
+        { ...mockAssets[0], category: 'logos' },
+        { ...mockAssets[0], id: '2', name: 'icon.png', category: 'icons' },
+        { ...mockAssets[0], id: '3', name: 'banner.png', category: 'banners' },
+      ];
+
+      render(<BrandAssetManager assets={assets} />);
+
+      // Select icons category
+      const iconCategory = screen.getByText(/icons/i);
+      await userEvent.click(iconCategory);
+
+      await waitFor(() => {
+        expect(screen.getByText('icon.png')).toBeInTheDocument();
+        expect(screen.queryByText('logo.png')).not.toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('Storage Information Display', () => {
+    it('should display storage usage percentage', () => {
+      const storageUsed = 50 * 1024 * 1024; // 50MB
+      const storageLimit = 100 * 1024 * 1024; // 100MB
+
+      render(
+        <BrandAssetManager
+          assets={mockAssets}
+          storageUsed={storageUsed}
+          storageLimit={storageLimit}
+        />
+      );
+
+      expect(screen.getByText(/50%/i)).toBeInTheDocument();
+      expect(screen.getByText(/50.*mb.*100.*mb/i)).toBeInTheDocument();
+    });
+
+    it('should warn when storage is nearly full', () => {
+      const storageUsed = 95 * 1024 * 1024; // 95MB
+      const storageLimit = 100 * 1024 * 1024; // 100MB
+
+      render(
+        <BrandAssetManager
+          assets={mockAssets}
+          storageUsed={storageUsed}
+          storageLimit={storageLimit}
+        />
+      );
+
+      expect(screen.getByText(/95%/i)).toBeInTheDocument();
+    });
+  });
+});

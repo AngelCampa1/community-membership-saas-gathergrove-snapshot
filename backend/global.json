@@ -1,0 +1,17 @@
+{
+  "sdk": {
+    "version": "9.0.303",
+    "rollForward": "latest"
+  },
+  "msbuild-sdks": {
+    "enable": true,
+    "packages": {
+      "Microsoft.EntityFrameworkCore.SqlServer": {
+        "version": "9.0.0"
+      },
+      "Microsoft.EntityFrameworkCore.Tools": {
+        "version": "9.0.0"
+      }
+    }
+  }
+}

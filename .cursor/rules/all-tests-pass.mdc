@@ -1,0 +1,4 @@
+---
+alwaysApply: true
+---
+After completing a task and making code changes, run all tests in the affected project (either mobile, client or backend). If there are failing tests, make root cause analysis, identifying either application bugs or test bugs and addressing them accordingly. The task is not complete until all tests pass.

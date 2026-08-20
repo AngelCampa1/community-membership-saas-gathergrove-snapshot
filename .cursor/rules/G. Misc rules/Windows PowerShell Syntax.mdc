@@ -1,0 +1,48 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+## 18. Windows PowerShell Syntax
+
+### Command Chaining in Windows PowerShell
+**Windows PowerShell does NOT support the `&&` operator for command chaining.**
+
+**❌ WRONG (causes errors):**
+```powershell
+cd backend && dotnet build
+npm install && npm run build
+```
+
+**✅ CORRECT syntax:**
+```powershell
+# Option 1: Use semicolon for sequential commands
+cd backend; dotnet build
+
+# Option 2: Use separate command calls
+cd backend
+dotnet build
+
+# Option 3: Use PowerShell's pipeline operators when appropriate
+cd backend | dotnet build
+
+# Option 4: Use conditional operators
+cd backend; if ($LASTEXITCODE -eq 0) { dotnet build }
+```
+
+### Common PowerShell Patterns
+- **Sequential execution**: Use `;` or separate commands
+- **Conditional execution**: Use `if ($LASTEXITCODE -eq 0) { ... }`
+- **Pipeline**: Use `|` for passing output between commands
+- **Background jobs**: Use `Start-Job` or `&` for background execution
+
+### Why This Matters
+Using incorrect syntax results in:
+- Multiple failed tool calls
+- Wasted time and resources
+- Confusion in the development workflow
+- Parser errors that break automation
+
+**Always use proper PowerShell syntax to avoid multiple tool call attempts.**
+
+

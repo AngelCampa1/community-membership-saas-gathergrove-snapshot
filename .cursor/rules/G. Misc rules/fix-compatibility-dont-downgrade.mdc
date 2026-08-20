@@ -1,0 +1,143 @@
+---
+description: 
+globs: *.tsx,*.ts,*.js
+alwaysApply: false
+---
+## Fix Compatibility Issues - Don't Downgrade Versions
+
+### Problem Pattern
+When encountering version compatibility errors, syntax errors, or parsing issues, there's a temptation to immediately downgrade to older, "safer" versions instead of fixing the actual compatibility issue.
+
+### Root Cause
+**Downgrading wastes modern features and creates technical debt instead of solving the underlying problem**
+
+### Solution Pattern
+**MANDATORY: Fix the compatibility issue, never downgrade unless absolutely critical**
+
+#### 1. Investigate Root Cause First
+
+**❌ WRONG - Immediate downgrade:**
+```bash
+# React Native parsing error occurs
+yarn add react@17.0.0  # Downgrade React
+yarn add react-native@0.70.0  # Downgrade React Native
+```
+
+**✅ CORRECT - Fix the actual issue:**
+```bash
+# 1. Check if it's a configuration issue (Babel, TypeScript, Metro)
+# 2. Look for known compatibility patterns/workarounds
+# 3. Update configuration files to handle new syntax
+# 4. Only downgrade as absolute last resort with documentation
+```
+
+#### 2. Common Compatibility Fix Patterns
+
+**TypeScript Parsing Issues:**
+```typescript
+// Fix tsconfig.json for newer syntax support
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": ["ES2020", "DOM"],
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true  // Often fixes parsing issues
+  }
+}
+```
+
+**Babel Configuration Issues:**
+```javascript
+// Fix babel.config.js for modern syntax
+module.exports = {
+  presets: [
+    '@babel/preset-env',
+    '@react-native/babel-preset',
+  ],
+  plugins: [
+    // Add plugins for newer syntax support
+  ]
+};
+```
+
+**Metro Bundler Issues:**
+```javascript
+// Fix metro.config.js for parsing
+module.exports = {
+  resolver: {
+    sourceExts: ['js', 'json', 'ts', 'tsx', 'jsx'],
+  },
+  transformer: {
+    // Add transformers for new syntax
+  }
+};
+```
+
+#### 3. Systematic Debugging Approach
+
+**MANDATORY steps when compatibility errors occur:**
+
+1. **Identify exact error location** - Which file, which line, which syntax
+2. **Check configuration files** - babel.config.js, tsconfig.json, metro.config.js
+3. **Review parser settings** - Ensure parsers support the syntax being used
+4. **Search for known issues** - Check if it's a documented compatibility issue
+5. **Apply targeted fix** - Update configuration, not versions
+6. **Test the fix** - Verify the error is resolved
+7. **Document the solution** - Add to rules if pattern emerges
+
+#### 4. When Downgrading Is Acceptable (Rare)
+
+**ONLY acceptable with full documentation:**
+```bash
+# EXAMPLE: Critical production blocker with no workaround
+# TODO: Upgrade back to React 19 when compatibility issue resolved
+# See issue: https://github.com/facebook/react-native/issues/XXXXX
+# Timeline: Expected fix in React Native 0.80.0
+yarn add react@18.2.0
+```
+
+### Benefits of Fixing vs Downgrading
+
+**Technical Benefits:**
+- ✅ Access to latest features and performance improvements
+- ✅ Better security with newer versions
+- ✅ Future-proof codebase
+- ✅ Learning opportunity for team
+
+**Project Benefits:**
+- ✅ Avoids technical debt accumulation
+- ✅ Maintains competitive feature set
+- ✅ Reduces future migration effort
+- ✅ Demonstrates problem-solving skills
+
+### Implementation Results
+
+**Success Indicators:**
+- ✅ Error resolved without version downgrades
+- ✅ All latest features remain available
+- ✅ Configuration properly handles modern syntax
+- ✅ Documentation of solution for future reference
+
+### Meta-Learning
+
+**"Every compatibility issue is a configuration opportunity, not a version problem"**
+
+Most compatibility issues stem from:
+- Outdated parser configurations
+- Missing polyfills or transformers
+- Incorrect TypeScript settings
+- Babel preset misconfigurations
+
+**The solution is almost always in configuration, not version changes.**
+
+### Prevention Protocol
+
+1. **Keep configurations updated** with package versions
+2. **Test compatibility** when upgrading packages
+3. **Document configuration patterns** that work
+4. **Share solutions** with team when found
+5. **Create rules** for recurring patterns
+
+**This rule ensures projects stay current while maintaining stability.** 

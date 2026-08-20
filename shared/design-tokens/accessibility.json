@@ -1,0 +1,19 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "name": "GatherGrove Accessibility Tokens",
+  "description": "WCAG 2.1 AA compliance tokens: touch targets, focus rings. Shared across web and mobile.",
+
+  "accessibility": {
+    "touchTarget": {
+      "minimum":     { "value": "44px",  "type": "dimension", "mobile": 44,  "description": "WCAG 2.1 AA minimum touch target (2.5.5)" },
+      "recommended": { "value": "48px",  "type": "dimension", "mobile": 48,  "description": "Recommended touch target for better UX" },
+      "optimal":     { "value": "52px",  "type": "dimension", "mobile": 52,  "description": "Optimal touch target size" },
+      "spacing":     { "value": "8px",   "type": "dimension", "mobile": 8,   "description": "Minimum spacing between touch targets" }
+    },
+    "focusRing": {
+      "width":  { "value": "2px",           "type": "dimension",  "description": "Focus ring border width" },
+      "offset": { "value": "2px",           "type": "dimension",  "description": "Focus ring offset from element" },
+      "color":  { "value": "hsl(var(--ring))", "type": "other",   "description": "Focus ring color — references CSS --ring var" }
+    }
+  }
+}

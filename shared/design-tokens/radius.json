@@ -1,0 +1,18 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "name": "GatherGrove Border Radius Tokens",
+  "description": "Border radius scale. CSS vars mirror globals.css --radius-* variables. Mobile values are numeric px.",
+
+  "radius": {
+    "none":    { "value": "0px",     "type": "dimension", "mobile": 0,    "description": "No rounding" },
+    "xs":      { "value": "0.25rem", "type": "dimension", "mobile": 4,    "description": "Extra small — 4px" },
+    "sm":      { "value": "0.5rem",  "type": "dimension", "mobile": 8,    "description": "Small — 8px (--radius-sm)" },
+    "DEFAULT": { "value": "0.75rem", "type": "dimension", "mobile": 12,   "description": "Default — 12px (--radius, --radius-md)" },
+    "md":      { "value": "0.75rem", "type": "dimension", "mobile": 12,   "description": "Medium — 12px (--radius-md)" },
+    "lg":      { "value": "1rem",    "type": "dimension", "mobile": 16,   "description": "Large — 16px (--radius-lg)" },
+    "xl":      { "value": "1.25rem", "type": "dimension", "mobile": 20,   "description": "Extra large — 20px (--radius-xl)" },
+    "2xl":     { "value": "1.5rem",  "type": "dimension", "mobile": 24,   "description": "2XL — 24px (--radius-2xl)" },
+    "3xl":     { "value": "2rem",    "type": "dimension", "mobile": 32,   "description": "3XL — 32px" },
+    "full":    { "value": "9999px",  "type": "dimension", "mobile": 9999, "description": "Fully rounded pill (--radius-full)" }
+  }
+}

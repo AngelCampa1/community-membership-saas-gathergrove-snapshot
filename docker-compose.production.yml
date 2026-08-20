@@ -1,0 +1,212 @@
+version: '3.8'
+
+services:
+  # Backend API Service
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.production
+      args:
+        - BUILD_CONFIGURATION=Release
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_HTTPS_PORT=443
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetcore.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${CERT_PASSWORD}
+      # Azure Key Vault configuration
+      - AZURE_CLIENT_ID=${AZURE_CLIENT_ID}
+      - AZURE_CLIENT_SECRET=${AZURE_CLIENT_SECRET}
+      - AZURE_TENANT_ID=${AZURE_TENANT_ID}
+      # Application Insights
+      - APPLICATIONINSIGHTS_CONNECTION_STRING=${APPLICATIONINSIGHTS_CONNECTION_STRING}
+      # Public marketing form abuse hardening
+      - TURNSTILE_SITE_KEY=${TURNSTILE_SITE_KEY}
+      - TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY}
+      - TRUSTED_PROXY=${TRUSTED_PROXY:-true}
+      - TrustedProxy__KnownNetworks__0=172.20.0.0/16
+      - TRUSTED_PROXY_KNOWN_NETWORKS=${TRUSTED_PROXY_KNOWN_NETWORKS:-172.20.0.0/16}
+    volumes:
+      - ${CERT_PATH}:/https:ro
+    depends_on:
+      - redis
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    networks:
+      - app-network
+    labels:
+      - "com.gathergrove.service=api"
+      - "com.gathergrove.environment=production"
+
+  # Redis Cache Service
+  redis:
+    image: redis:7-alpine
+    command: >
+      sh -c 'printf "requirepass %s\nappendonly yes\n" "$$(cat /run/secrets/redis_password)" > /tmp/redis.conf
+      && exec redis-server /tmp/redis.conf'
+    secrets:
+      - redis_password
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$$(cat /run/secrets/redis_password)\" ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    networks:
+      - app-network
+    labels:
+      - "com.gathergrove.service=redis"
+      - "com.gathergrove.environment=production"
+
+  # Frontend Client Service (Static files)
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.production
+      args:
+        - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+        - NEXT_PUBLIC_TURNSTILE_SITE_KEY=${NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+        - NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
+        - NEXT_PUBLIC_APPLICATION_INSIGHTS_CONNECTION_STRING=${NEXT_PUBLIC_APPLICATION_INSIGHTS_CONNECTION_STRING}
+        - NODE_ENV=production
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+      - NEXT_PUBLIC_TURNSTILE_SITE_KEY=${NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+      - NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
+      - NEXT_PUBLIC_APPLICATION_INSIGHTS_CONNECTION_STRING=${NEXT_PUBLIC_APPLICATION_INSIGHTS_CONNECTION_STRING}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    networks:
+      - app-network
+    labels:
+      - "com.gathergrove.service=client"
+      - "com.gathergrove.environment=production"
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.production.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - nginx-cache:/var/cache/nginx
+    depends_on:
+      - api
+      - client
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+    networks:
+      - app-network
+    labels:
+      - "com.gathergrove.service=nginx"
+      - "com.gathergrove.environment=production"
+
+  # Monitoring and Logging
+  fluentd:
+    image: fluent/fluentd:v1.16-debian-1
+    volumes:
+      - ./fluentd/fluent.production.conf:/fluentd/etc/fluent.conf:ro
+      - fluentd-data:/var/log/fluentd-buffers
+    environment:
+      - FLUENTD_CONF=fluent.conf
+      - FLUENTD_OPT=-v
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    networks:
+      - app-network
+    labels:
+      - "com.gathergrove.service=fluentd"
+      - "com.gathergrove.environment=production"
+
+volumes:
+  redis-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /var/lib/docker/volumes/gathergrove-redis-data/_data
+  nginx-cache:
+    driver: local
+  fluentd-data:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# Production-specific settings
+configs:
+  api_config:
+    external: true
+  nginx_config:
+    external: true
+
+secrets:
+  cert_password:
+    external: true
+  redis_password:
+    external: true

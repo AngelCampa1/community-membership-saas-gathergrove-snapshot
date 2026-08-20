@@ -1,0 +1,19 @@
+{
+  "name": "gathergrove-e2e",
+  "version": "1.0.0",
+  "description": "E2E tests for GatherGrove",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "report": "playwright show-report",
+    "screenshots": "node screenshots.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.57.0"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3"
+  }
+}

@@ -1,0 +1,69 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Source code
+*.cs text diff=csharp
+*.ts text
+*.tsx text
+*.js text
+*.jsx text
+*.json text
+*.md text
+*.yml text
+*.yaml text
+
+# Configuration files
+*.config text
+*.conf text
+*.ini text
+
+# Web files
+*.html text diff=html
+*.css text
+*.scss text
+*.sass text
+
+# Documentation
+*.txt text
+*.rtf text
+
+# Scripts
+*.sh text eol=lf
+*.ps1 text eol=crlf
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# Serialized files
+*.xml text
+*.svg text
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.7z binary
+*.tar binary
+*.gz binary
+*.dll binary
+*.exe binary
+*.msi binary
+
+# Font files
+*.woff binary
+*.woff2 binary
+*.eot binary
+*.ttf binary
+*.otf binary
+
+# Database files
+*.db binary
+*.sqlite binary
+*.sqlite3 binary
+
+# Package files
+*.nupkg binary
+*.snupkg binary 

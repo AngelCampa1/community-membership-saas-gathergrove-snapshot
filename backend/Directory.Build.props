@@ -1,0 +1,16 @@
+<Project>
+  <PropertyGroup>
+    <!-- Test Configuration -->
+    <VSTestCollectCodeCoverage>false</VSTestCollectCodeCoverage>
+    <VSTestBlameDataCollectors></VSTestBlameDataCollectors>
+    <VSTestBlameHangTimeout>30000</VSTestBlameHangTimeout>
+    <VSTestBlameCollectDump>false</VSTestBlameCollectDump>
+    
+    <!-- Reduce parallel test execution to prevent resource conflicts -->
+    <MaxParallelTestClasses>1</MaxParallelTestClasses>
+    <ParallelizeTestCollections>false</ParallelizeTestCollections>
+    
+    <!-- Set reasonable timeouts -->
+    <TestTimeout>30000</TestTimeout>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,669 @@
+"use client";
+
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Activity,
+  Wifi,
+  WifiOff,
+  Send,
+  MessageSquare,
+  BarChart3,
+  Calendar,
+  Users,
+  AlertTriangle,
+  CheckCircle,
+  Clock,
+  Zap
+} from 'lucide-react';
+import { toast } from '@/components/ui/sonner';
+import { getSignalRConnection } from '@/services/signalrService';
+import { useAuth } from '@/hooks/useAuth';
+
+interface TestMetrics {
+  connectionTime: number;
+  messagesSent: number;
+  messagesReceived: number;
+  errors: number;
+  reconnections: number;
+  latency: number[];
+  averageLatency: number;
+  maxLatency: number;
+  throughput: number;
+}
+
+interface ConnectionStatus {
+  hub: string;
+  connected: boolean;
+  connecting: boolean;
+  error: string | null;
+  lastConnected: Date | null;
+  metrics: TestMetrics;
+}
+
+export default function SignalRTestDashboard() {
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState('overview');
+  const [isRunning, setIsRunning] = useState(false);
+  const [testDuration, setTestDuration] = useState(60);
+  const [messageInterval, setMessageInterval] = useState(1000);
+  const [concurrentConnections, setConcurrentConnections] = useState(1);
+
+  const [connections, setConnections] = useState<Record<string, ConnectionStatus>>({});
+  const [realtimeLog, setRealtimeLog] = useState<Array<{
+    timestamp: Date;
+    hub: string;
+    message: string;
+    type: 'info' | 'success' | 'error' | 'warning';
+  }>>([]);
+
+  const [testResults, setTestResults] = useState<TestMetrics | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const startTimeRef = useRef<number | null>(null);
+
+  const hubConfigs = [
+    { name: 'chat', label: 'Chat Hub', description: 'Real-time messaging' },
+    { name: 'engagement', label: 'Engagement Hub', description: 'Member engagement tracking' },
+    { name: 'eventEngagement', label: 'Event Engagement Hub', description: 'Event analytics and updates' }
+  ];
+
+  const addLogEntry = useCallback((hub: string, message: string, type: 'info' | 'success' | 'error' | 'warning' = 'info') => {
+    setRealtimeLog(prev => [{
+      timestamp: new Date(),
+      hub,
+      message,
+      type
+    }, ...prev].slice(0, 100));
+  }, []);
+
+  const initializeConnection = useCallback(async (hubName: string) => {
+    if (!user?.clubId) {
+      addLogEntry(hubName, 'No club ID available', 'error');
+      return;
+    }
+
+    try {
+      setConnections(prev => ({
+        ...prev,
+        [hubName]: {
+          hub: hubName,
+          connected: false,
+          connecting: true,
+          error: null,
+          lastConnected: null,
+          metrics: {
+            connectionTime: 0,
+            messagesSent: 0,
+            messagesReceived: 0,
+            errors: 0,
+            reconnections: 0,
+            latency: [],
+            averageLatency: 0,
+            maxLatency: 0,
+            throughput: 0
+          }
+        }
+      }));
+
+      const startTime = performance.now();
+      const connection = await getSignalRConnection(hubName);
+      const connectionTime = performance.now() - startTime;
+
+      // Setup event listeners - add null check
+      if (!connection) {
+        throw new Error(`Failed to get SignalR connection for ${hubName}`);
+      }
+
+      connection.onConnectionStatus(
+        () => {
+          setConnections(prev => ({
+            ...prev,
+            [hubName]: {
+              ...prev[hubName],
+              connected: true,
+              connecting: false,
+              error: null,
+              lastConnected: new Date()
+            }
+          }));
+          addLogEntry(hubName, 'Connected successfully', 'success');
+        },
+        () => {
+          setConnections(prev => ({
+            ...prev,
+            [hubName]: {
+              ...prev[hubName],
+              connected: false,
+              connecting: false,
+              error: 'Disconnected'
+            }
+          }));
+          addLogEntry(hubName, 'Disconnected', 'warning');
+        },
+        () => {
+          addLogEntry(hubName, 'Reconnecting...', 'info');
+        },
+        () => {
+          setConnections(prev => ({
+            ...prev,
+            [hubName]: {
+              ...prev[hubName],
+              connected: true,
+              connecting: false,
+              error: null,
+              lastConnected: new Date()
+            }
+          }));
+          addLogEntry(hubName, 'Reconnected successfully', 'success');
+        }
+      );
+
+      // Hub-specific event listeners
+      if (hubName === 'chat') {
+        connection.on('NewMessage', (message: any) => {
+          setConnections(prev => {
+            const metrics = { ...prev[hubName].metrics };
+            metrics.messagesReceived++;
+            return {
+              ...prev,
+              [hubName]: { ...prev[hubName], metrics }
+            };
+          });
+          addLogEntry(hubName, `New message: ${JSON.stringify(message).substring(0, 100)}...`, 'info');
+        });
+
+        // Join club chat
+        await connection.invoke('JoinClubChat', user.clubId);
+        addLogEntry(hubName, `Joined club ${user.clubId} chat`, 'success');
+      }
+
+      setConnections(prev => ({
+        ...prev,
+        [hubName]: {
+          ...prev[hubName],
+          connected: true,
+          connecting: false,
+          error: null,
+          lastConnected: new Date(),
+          metrics: {
+            ...prev[hubName].metrics,
+            connectionTime
+          }
+        }
+      }));
+
+      addLogEntry(hubName, `Connection established in ${connectionTime.toFixed(2)}ms`, 'success');
+
+    } catch (error) {
+      setConnections(prev => ({
+        ...prev,
+        [hubName]: {
+          ...prev[hubName],
+          connected: false,
+          connecting: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          lastConnected: null
+        }
+      }));
+      addLogEntry(hubName, `Connection failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
+    }
+  }, [user?.clubId, addLogEntry]);
+
+  const startTest = useCallback(async () => {
+    setIsRunning(true);
+    startTimeRef.current = Date.now();
+    setTestResults(null);
+    setRealtimeLog([]);
+
+    // Initialize all connections
+    for (const hub of hubConfigs) {
+      await initializeConnection(hub.name);
+    }
+
+    // Start performance monitoring
+    intervalRef.current = setInterval(() => {
+      // Update metrics for all connections
+      setConnections(prev => {
+        const updated = { ...prev };
+        Object.keys(updated).forEach(hubName => {
+          const conn = updated[hubName];
+          const elapsed = startTimeRef.current ? (Date.now() - startTimeRef.current) / 1000 : 1;
+          const totalMessages = conn.metrics.messagesSent + conn.metrics.messagesReceived;
+
+          updated[hubName].metrics.throughput = totalMessages / elapsed;
+
+          const latencies = conn.metrics.latency;
+          if (latencies.length > 0) {
+            updated[hubName].metrics.averageLatency = latencies.reduce((a, b) => a + b, 0) / latencies.length;
+            updated[hubName].metrics.maxLatency = Math.max(...latencies);
+          }
+        });
+        return updated;
+      });
+    }, 1000);
+
+    // Send test messages periodically
+    const messageInterval = setInterval(async () => {
+      for (const hub of hubConfigs) {
+        const connection = connections[hub.name];
+        if (connection?.connected) {
+          try {
+            // Simulate different operations based on hub type
+            if (hub.name === 'chat') {
+              await getSignalRConnection(hub.name).then(conn =>
+                conn.invoke('SendMessage', user?.clubId, { messageContent: `Test message ${Date.now()}` })
+              );
+            } else if (hub.name === 'eventEngagement') {
+              await getSignalRConnection(hub.name).then(conn =>
+                conn.invoke('RefreshEventEngagement', 123)
+              );
+            }
+
+            setConnections(prev => ({
+              ...prev,
+              [hub.name]: {
+                ...prev[hub.name],
+                metrics: {
+                  ...prev[hub.name].metrics,
+                  messagesSent: prev[hub.name].metrics.messagesSent + 1
+                }
+              }
+            }));
+
+            addLogEntry(hub.name, 'Test message sent', 'info');
+          } catch (error) {
+            setConnections(prev => ({
+              ...prev,
+              [hub.name]: {
+                ...prev[hub.name],
+                metrics: {
+                  ...prev[hub.name].metrics,
+                  errors: prev[hub.name].metrics.errors + 1
+                }
+              }
+            }));
+            addLogEntry(hub.name, `Failed to send message: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
+          }
+        }
+      }
+    }, messageInterval);
+
+    // Cleanup after test duration
+    setTimeout(() => {
+      clearInterval(intervalRef.current!);
+      clearInterval(messageInterval);
+
+      // Calculate final results
+      const totalMetrics = Object.values(connections).reduce((acc, conn) => ({
+        connectionTime: Math.max(acc.connectionTime, conn.metrics.connectionTime),
+        messagesSent: acc.messagesSent + conn.metrics.messagesSent,
+        messagesReceived: acc.messagesReceived + conn.metrics.messagesReceived,
+        errors: acc.errors + conn.metrics.errors,
+        reconnections: acc.reconnections + conn.metrics.reconnections,
+        latency: [...acc.latency, ...conn.metrics.latency],
+        averageLatency: 0,
+        maxLatency: Math.max(acc.maxLatency, conn.metrics.maxLatency),
+        throughput: acc.throughput + conn.metrics.throughput
+      }), {
+        connectionTime: 0,
+        messagesSent: 0,
+        messagesReceived: 0,
+        errors: 0,
+        reconnections: 0,
+        latency: [],
+        averageLatency: 0,
+        maxLatency: 0,
+        throughput: 0
+      });
+
+      totalMetrics.averageLatency = totalMetrics.latency.length > 0
+        ? totalMetrics.latency.reduce((a, b) => a + b, 0) / totalMetrics.latency.length
+        : 0;
+
+      setTestResults(totalMetrics);
+      setIsRunning(false);
+      addLogEntry('system', `Test completed. Results: ${JSON.stringify(totalMetrics)}`, 'success');
+    }, testDuration * 1000);
+
+  }, [testDuration, messageInterval, connections, hubConfigs, initializeConnection, addLogEntry, user?.clubId]);
+
+  const stopTest = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+    setIsRunning(false);
+    addLogEntry('system', 'Test stopped manually', 'warning');
+  }, [addLogEntry]);
+
+  const getStatusIcon = (connected: boolean, connecting: boolean) => {
+    if (connecting) return <Wifi className="h-4 w-4 animate-pulse text-warning" />;
+    if (connected) return <Wifi className="h-4 w-4 text-success" />;
+    return <WifiOff className="h-4 w-4 text-destructive" />;
+  };
+
+  const getStatusBadge = (connected: boolean, connecting: boolean, error: string | null) => {
+    if (connecting) return <Badge variant="secondary">Connecting</Badge>;
+    if (connected) return <Badge variant="default">Connected</Badge>;
+    if (error) return <Badge variant="destructive">Error</Badge>;
+    return <Badge variant="outline">Disconnected</Badge>;
+  };
+
+  const getLogIcon = (type: string) => {
+    switch (type) {
+      case 'success': return <CheckCircle className="h-4 w-4 text-success" />;
+      case 'error': return <AlertTriangle className="h-4 w-4 text-destructive" />;
+      case 'warning': return <AlertTriangle className="h-4 w-4 text-warning" />;
+      default: return <Activity className="h-4 w-4 text-primary" />;
+    }
+  };
+
+  return (
+    <div className="container mx-auto p-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">SignalR Test Dashboard</h1>
+          <p className="text-muted-foreground">Real-time connection testing and performance monitoring</p>
+        </div>
+        <div className="flex items-center space-x-4">
+          <Button
+            onClick={isRunning ? stopTest : startTest}
+            disabled={isRunning}
+            className="min-w-[120px]"
+          >
+            {isRunning ? (
+              <>
+                <Activity className="mr-2 h-4 w-4 animate-pulse" />
+                Stop Test
+              </>
+            ) : (
+              <>
+                <Zap className="mr-2 h-4 w-4" />
+                Start Test
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="connections">Connections</TabsTrigger>
+          <TabsTrigger value="performance">Performance</TabsTrigger>
+          <TabsTrigger value="logs">Real-time Logs</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Connected Hubs</CardTitle>
+                <Wifi className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {Object.values(connections).filter(c => c.connected).length}/{hubConfigs.length}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Messages Sent</CardTitle>
+                <Send className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {Object.values(connections).reduce((sum, c) => sum + c.metrics.messagesSent, 0)}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Messages Received</CardTitle>
+                <MessageSquare className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {Object.values(connections).reduce((sum, c) => sum + c.metrics.messagesReceived, 0)}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Errors</CardTitle>
+                <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-destructive">
+                  {Object.values(connections).reduce((sum, c) => sum + c.metrics.errors, 0)}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {testResults && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <BarChart3 className="mr-2 h-5 w-5" />
+                  Test Results
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <div className="text-sm font-medium text-muted-foreground">Total Messages</div>
+                    <div className="text-2xl font-bold">
+                      {testResults.messagesSent + testResults.messagesReceived}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-muted-foreground">Average Latency</div>
+                    <div className="text-2xl font-bold">
+                      {testResults.averageLatency.toFixed(2)}ms
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-muted-foreground">Throughput</div>
+                    <div className="text-2xl font-bold">
+                      {testResults.throughput.toFixed(2)} msg/s
+                    </div>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <div className="text-sm font-medium text-muted-foreground">Max Latency</div>
+                    <div className="text-xl font-semibold">
+                      {testResults.maxLatency.toFixed(2)}ms
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-muted-foreground">Error Rate</div>
+                    <div className="text-xl font-semibold text-destructive">
+                      {((testResults.errors / (testResults.messagesSent + testResults.messagesReceived)) * 100).toFixed(2)}%
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        <TabsContent value="connections" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {hubConfigs.map(hub => {
+              const connection = connections[hub.name] || {
+                hub: hub.name,
+                connected: false,
+                connecting: false,
+                error: null,
+                lastConnected: null,
+                metrics: {
+                  connectionTime: 0,
+                  messagesSent: 0,
+                  messagesReceived: 0,
+                  errors: 0,
+                  reconnections: 0,
+                  latency: [],
+                  averageLatency: 0,
+                  maxLatency: 0,
+                  throughput: 0
+                }
+              };
+
+              return (
+                <Card key={hub.name}>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="flex items-center">
+                        {getStatusIcon(connection.connected, connection.connecting)}
+                        <span className="ml-2">{hub.label}</span>
+                      </CardTitle>
+                      {getStatusBadge(connection.connected, connection.connecting, connection.error)}
+                    </div>
+                    <p className="text-sm text-muted-foreground">{hub.description}</p>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <div className="text-sm text-muted-foreground">Connection Time</div>
+                        <div className="font-semibold">{connection.metrics.connectionTime.toFixed(2)}ms</div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-muted-foreground">Reconnections</div>
+                        <div className="font-semibold">{connection.metrics.reconnections}</div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-muted-foreground">Messages Sent</div>
+                        <div className="font-semibold">{connection.metrics.messagesSent}</div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-muted-foreground">Messages Received</div>
+                        <div className="font-semibold">{connection.metrics.messagesReceived}</div>
+                      </div>
+                    </div>
+                    {connection.error && (
+                      <div className="text-sm text-destructive bg-destructive/10 p-2 rounded">
+                        Error: {connection.error}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="performance" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Test Configuration</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium">Test Duration (seconds)</label>
+                  <input
+                    type="number"
+                    value={testDuration}
+                    onChange={(e) => setTestDuration(Number(e.target.value))}
+                    disabled={isRunning}
+                    className="w-full mt-1 px-3 py-2 border rounded"
+                    min="10"
+                    max="300"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Message Interval (ms)</label>
+                  <input
+                    type="number"
+                    value={messageInterval}
+                    onChange={(e) => setMessageInterval(Number(e.target.value))}
+                    disabled={isRunning}
+                    className="w-full mt-1 px-3 py-2 border rounded"
+                    min="100"
+                    max="10000"
+                    step="100"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Concurrent Connections</label>
+                  <input
+                    type="number"
+                    value={concurrentConnections}
+                    onChange={(e) => setConcurrentConnections(Number(e.target.value))}
+                    disabled={isRunning}
+                    className="w-full mt-1 px-3 py-2 border rounded"
+                    min="1"
+                    max="10"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Performance Metrics</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {Object.entries(connections).map(([hubName, conn]) => (
+                  <div key={hubName} className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="font-medium">{hubName} Hub</span>
+                      <span>{conn.metrics.throughput.toFixed(2)} msg/s</span>
+                    </div>
+                    <Progress value={Math.min(conn.metrics.throughput * 10, 100)} className="h-2" />
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="logs" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Activity className="mr-2 h-5 w-5" />
+                Real-time Activity Log
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2 max-h-96 overflow-y-auto">
+                {realtimeLog.length === 0 ? (
+                  <div className="text-center text-muted-foreground py-8">
+                    No activity yet. Start a test to see real-time logs.
+                  </div>
+                ) : (
+                  realtimeLog.map((entry, index) => (
+                    <div key={index} className="flex items-start space-x-2 text-sm">
+                      {getLogIcon(entry.type)}
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2">
+                          <Badge variant="outline" className="text-xs">
+                            {entry.hub}
+                          </Badge>
+                          <span className="text-muted-foreground">
+                            {entry.timestamp.toLocaleTimeString()}
+                          </span>
+                        </div>
+                        <div className="mt-1">{entry.message}</div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}

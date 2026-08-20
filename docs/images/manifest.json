@@ -1,0 +1,13 @@
+{
+  "capturedAt": "2026-08-13T17:48:09.179Z",
+  "baseUrl": "http://localhost:3050",
+  "results": [
+    {
+      "name": "admin-members",
+      "path": "/admin/members",
+      "auth": true,
+      "ok": false,
+      "error": "bounced to http://localhost:3050/login (session-expired false positive)"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+---
+description: when deciding to use a tech stack
+globs: 
+alwaysApply: false
+---
+Consistently use the project's defined technology stack:
+
+Backend: .NET 8, ASP.NET Core, EF Core, MS SQL Server
+Frontend: Next.js, TypeScript
+Mobile (Future): React Native Adhere to established C# and TypeScript coding conventions and architectural patterns.
+

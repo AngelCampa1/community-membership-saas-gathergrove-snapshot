@@ -1,0 +1,151 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+## Never Delete Tests Rule - Preserve Testing Investment
+
+### Problem Pattern
+When tests fail, there's a temptation to delete them to "fix" the failing test suite, especially when dealing with complex mocking or configuration issues.
+
+### Critical Rule
+**NEVER DELETE TESTS - Tests represent valuable development investment and bug detection**
+
+### Why This Rule Matters
+
+**Tests Are Assets, Not Liabilities:**
+- Tests document expected behavior
+- Tests catch regressions and bugs
+- Tests provide safety net for refactoring
+- Tests represent significant development time investment
+- Deleting tests reduces overall code quality and confidence
+
+**Test Failures Indicate Real Issues:**
+- Failing tests often reveal application bugs (per Application Bugs First rule)
+- Test failures highlight integration problems
+- Mock failures can indicate API contract changes
+- Configuration issues expose environment problems
+
+### What To Do Instead
+
+**1. Investigate Application Bugs First**
+```typescript
+// ❌ WRONG - Delete failing test
+// delete PayDues.test.tsx
+
+// ✅ CORRECT - Check actual PayDues component for bugs
+// 1. Read PayDues.tsx implementation
+// 2. Verify Stripe integration logic
+// 3. Check payment flow and error handling
+// 4. Look for state management issues
+// 5. THEN fix test mocking if needed
+```
+
+**2. Fix The Root Cause**
+- **Application Bug**: Fix the component/service implementation
+- **API Change**: Update both implementation and tests together
+- **Mock Issue**: Correct the mock setup to match real implementation
+- **Environment**: Fix configuration or dependencies
+
+**3. Improve Tests, Don't Remove Them**
+```typescript
+// ❌ WRONG - Delete broken test
+rm PayDues.test.tsx
+
+// ✅ CORRECT - Fix and improve test
+// - Update mock patterns to match real implementation
+// - Add better error cases
+// - Improve test reliability
+// - Document complex test setup
+```
+
+### Emergency Temporary Measures
+
+**Only If Absolutely Necessary (CI/CD blocking):**
+```typescript
+// ✅ TEMPORARY - Skip test, don't delete
+describe.skip('PayDues Component', () => {
+  // TODO: Fix PayDues mocking issues - Issue #123
+  // Original failing tests preserved below
+});
+```
+
+**Never Acceptable:**
+- Deleting test files
+- Removing test cases without replacement
+- Commenting out entire test suites
+
+### Benefits of Preserving Tests
+
+**Development Benefits:**
+- ✅ Maintains documentation of expected behavior
+- ✅ Provides regression protection
+- ✅ Enables confident refactoring
+- ✅ Preserves development investment
+
+**Quality Benefits:**
+- ✅ Catches real application bugs
+- ✅ Maintains test coverage metrics
+- ✅ Ensures comprehensive testing
+- ✅ Builds team confidence in codebase
+
+**Business Benefits:**
+- ✅ Prevents production bugs
+- ✅ Reduces debugging time
+- ✅ Maintains software reliability
+- ✅ Protects user experience
+
+### Implementation Process
+
+**When Tests Fail:**
+1. **Stop** - Don't delete anything
+2. **Investigate** - Check for application bugs first
+3. **Fix** - Address root cause (app bug or test issue)
+4. **Improve** - Make tests more robust
+5. **Document** - Add comments for complex scenarios
+
+### Examples of Proper Response
+
+**Failing PayDues Tests Example:**
+```typescript
+// ❌ WRONG Response:
+// "These Stripe mocks are too complex, let's just delete the tests"
+
+// ✅ CORRECT Response:
+// 1. Check PayDues.tsx for actual Stripe integration bugs
+// 2. Verify payment form submission logic
+// 3. Look for state management issues in payment flow
+// 4. Check if Elements wrapper is properly implemented
+// 5. Fix any discovered application bugs
+// 6. THEN adjust test mocks if needed
+```
+
+### Quality Gates
+
+**Before Any Test Modification:**
+- [ ] Application implementation has been thoroughly reviewed
+- [ ] Real bugs have been ruled out or fixed
+- [ ] Test failures are confirmed to be test-only issues
+- [ ] Alternative solutions have been considered
+
+**Never Allowed:**
+- ❌ Deleting test files to fix CI
+- ❌ Removing tests due to complexity
+- ❌ "Temporarily" deleting tests without tickets
+- ❌ Deleting tests during time pressure
+
+### Meta-Learning
+
+**"Tests are canaries in the coal mine - they die for a reason"**
+
+Test failures are signals, not noise. Deleting tests is like removing smoke detectors because they're too loud. The goal is to fix the fire, not silence the alarm.
+
+**This rule ensures:**
+- ✅ Application bugs are discovered and fixed
+- ✅ Testing investment is preserved
+- ✅ Code quality remains high
+- ✅ Team confidence in codebase grows
+- ✅ Production reliability increases
+
+**Remember: A failing test is worth more than no test at all.**
+

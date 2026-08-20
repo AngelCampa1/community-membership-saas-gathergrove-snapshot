@@ -1,0 +1,144 @@
+---
+description: 
+globs: *.tsx,*.ts,*.js
+alwaysApply: false
+---
+## 23. Development-Time Test ID Integration Pattern - Unified Development & Testing
+
+### Problem Pattern
+Test IDs added as retrofit after development causes:
+- Tests breaking constantly due to UI changes
+- Brittle selectors (CSS classes, text content)
+- Significant time spent updating tests instead of developing features
+- Disconnect between development and testing workflows
+
+### Solution Pattern
+**Add `data-testid` attributes during component development, not after**
+
+This creates stable, reliable test automation that survives UI changes.
+
+### Implementation
+
+**❌ WRONG - Retrofit approach:**
+```typescript
+// Development: Build component without test IDs
+<Button className="submit-btn">Submit</Button>
+
+// Later: Add test IDs when tests break
+<Button className="submit-btn" data-testid="button-submit">Submit</Button>
+```
+
+**✅ CORRECT - Development-time integration:**
+```typescript
+// During development: Add test IDs immediately
+<Button 
+  type="submit"
+  data-testid="button-register"  // Added during development
+  className="w-full"
+  disabled={!isFormComplete || isLoading}
+>
+  Create My Account
+</Button>
+
+// Error states with test IDs
+{errors.fullName && (
+  <p className="text-sm text-destructive" data-testid="error-fullName">
+    {errors.fullName}
+  </p>
+)}
+```
+
+### Test ID Naming Patterns
+
+**MANDATORY patterns for consistency:**
+
+```typescript
+// Form elements
+data-testid="input-{fieldname}"     // input-email, input-password
+data-testid="button-{action}"       // button-submit, button-cancel
+data-testid="checkbox-{name}"       // checkbox-terms
+
+// Navigation
+data-testid="link-{destination}"    // link-login, link-dashboard
+data-testid="nav-{section}"         // nav-header, nav-sidebar
+
+// Content areas
+data-testid="section-{name}"        // section-hero, section-pricing
+data-testid="card-{type}"           // card-user, card-plan
+
+// States
+data-testid="error-{field}"         // error-email, error-password
+data-testid="loading-{action}"      // loading-submit, loading-search
+data-testid="success-{action}"      // success-registration
+```
+
+### E2E Test Integration
+
+**Tests use test IDs as primary locators:**
+```typescript
+// Page object with test IDs (PREFERRED)
+this.emailInput = page.getByTestId('input-email');
+this.submitButton = page.getByTestId('button-register');
+this.emailError = page.getByTestId('error-email');
+
+// Fallback to role-based (when test ID missing)
+this.submitButton = page.getByRole('button', { name: 'Submit' });
+```
+
+### Development Workflow
+
+**MANDATORY steps for every interactive element:**
+
+1. **Add test ID during component creation** (not after)
+2. **Follow naming pattern consistently** 
+3. **Include test IDs in error/success states**
+4. **Document test IDs in component comments** if complex
+
+### Examples from Implementation
+
+**Registration form with complete test ID coverage:**
+```typescript
+<Input
+  id="email"
+  data-testid="input-email"          // ✅ Added during development
+  type="email"
+  value={formData.email}
+  onChange={handleEmailChange}
+/>
+{errors.email && (
+  <p data-testid="error-email">     // ✅ Error state covered
+    {errors.email}
+  </p>
+)}
+```
+
+### Benefits
+
+**Development Benefits:**
+- ✅ No test maintenance overhead
+- ✅ UI changes don't break tests
+- ✅ Faster development iteration
+
+**Testing Benefits:**
+- ✅ Reliable, stable locators
+- ✅ Clear element identification
+- ✅ Consistent automation patterns
+
+**Team Benefits:**
+- ✅ Single workflow for dev + test
+- ✅ Reduced communication overhead
+- ✅ Faster feature delivery
+
+### Prevention
+1. **NEVER develop interactive elements without test IDs**
+2. **Review test ID patterns during code review**
+3. **Use test IDs in development debugging** (shows their value)
+4. **Update test IDs when refactoring** (maintain consistency)
+
+### Quality Gates
+- **Code review**: Check for missing test IDs on interactive elements
+- **E2E tests**: Must use `getByTestId()` as primary locator strategy
+- **UI changes**: Update test IDs before merging, not after tests break
+
+**This approach eliminates 90% of test maintenance overhead while accelerating development.**
+

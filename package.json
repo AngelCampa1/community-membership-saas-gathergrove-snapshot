@@ -1,0 +1,21 @@
+{
+  "name": "gathergrove",
+  "version": "1.0.0",
+  "description": "GatherGrove - Club Management Platform",
+  "scripts": {
+    "generate-assets": "node generate-all-assets.js",
+    "assets": "npm run generate-assets",
+    "security:scan-secrets": "node scripts/security/scan-secrets.mjs",
+    "tokens:build": "node shared/design-tokens/build.mjs",
+    "tokens:watch": "node --watch shared/design-tokens/build.mjs",
+    "test": "node --test shared/design-tokens/__tests__/build.test.mjs"
+  },
+  "dependencies": {
+    "@radix-ui/react-tooltip": "^1.2.8",
+    "sharp": "^0.34.4"
+  },
+  "devDependencies": {
+    "style-dictionary": "^4.4.0",
+    "typescript": "^5.9.2"
+  }
+}

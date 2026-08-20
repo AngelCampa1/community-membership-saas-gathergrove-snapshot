@@ -1,0 +1,444 @@
+- generic [active] [ref=e1]:
+  - generic:
+    - link "Skip to main content" [ref=e2] [cursor=pointer]:
+      - /url: "#main-content"
+    - link "Skip to navigation" [ref=e3] [cursor=pointer]:
+      - /url: "#primary-navigation"
+    - link "Skip to search" [ref=e4] [cursor=pointer]:
+      - /url: "#search"
+    - link "Skip to footer" [ref=e5] [cursor=pointer]:
+      - /url: "#footer"
+  - main [ref=e6]:
+    - main [ref=e7]:
+      - banner [ref=e8]:
+        - generic [ref=e9]:
+          - link "GatherGrove GatherGrove" [ref=e10] [cursor=pointer]:
+            - /url: /
+            - img "GatherGrove" [ref=e11]
+            - generic [ref=e12]: GatherGrove
+          - generic [ref=e13]:
+            - button "Light-Only Mode" [ref=e14] [cursor=pointer]:
+              - img
+              - generic [ref=e15]: Light-Only Mode
+            - generic [ref=e16]:
+              - link "Login" [ref=e17] [cursor=pointer]:
+                - /url: /login
+              - link "Sign Up" [ref=e18] [cursor=pointer]:
+                - /url: /register
+      - generic [ref=e20]:
+        - navigation "Breadcrumb" [ref=e22]:
+          - list [ref=e23]:
+            - listitem [ref=e24]:
+              - link "Home" [ref=e25] [cursor=pointer]:
+                - /url: /
+              - generic [ref=e26]: /
+            - listitem [ref=e27]:
+              - generic [ref=e28]: Blog
+        - heading "Club Management Blog" [level=1] [ref=e29]
+        - paragraph [ref=e30]: Practical tips, templates, and how-to guides for volunteer club admins.
+      - generic [ref=e32]:
+        - generic [ref=e34]:
+          - button "All" [pressed] [ref=e35] [cursor=pointer]
+          - button "Operational How-Tos" [ref=e36] [cursor=pointer]
+          - button "Tools & Templates" [ref=e37] [cursor=pointer]
+          - button "Growth & Engagement" [ref=e38] [cursor=pointer]
+          - button "Seasonal Playbooks" [ref=e39] [cursor=pointer]
+          - button "Club Type Spotlights" [ref=e40] [cursor=pointer]
+        - generic [ref=e41]:
+          - link "Operational How-Tos 8 min read How to Set Up Online Registration for Your Club in Under 30 Minutes Stop collecting paper forms and spreadsheets. This step-by-step guide walks you through setting up online registration for your club in under 30 minutes. registration getting-started how-to Mar 30, 2026 Read more" [ref=e42] [cursor=pointer]:
+            - /url: /blog/online-registration-setup-guide
+            - generic [ref=e43]:
+              - generic [ref=e44]: Operational How-Tos
+              - generic [ref=e45]:
+                - img [ref=e46]
+                - text: 8 min read
+            - heading "How to Set Up Online Registration for Your Club in Under 30 Minutes" [level=3] [ref=e49]
+            - paragraph [ref=e50]: Stop collecting paper forms and spreadsheets. This step-by-step guide walks you through setting up online registration for your club in under 30 minutes.
+            - generic [ref=e51]:
+              - generic [ref=e52]: registration
+              - generic [ref=e53]: getting-started
+              - generic [ref=e54]: how-to
+            - generic [ref=e55]:
+              - generic [ref=e56]:
+                - img [ref=e57]
+                - text: Mar 30, 2026
+              - generic [ref=e59]:
+                - text: Read more
+                - img [ref=e60]
+          - link "Tools & Templates 6 min read 5 Free Dues Reminder Email Templates That Actually Get Paid Chasing down dues payments is exhausting. Use these 5 copy-paste email templates to collect membership dues without the awkward conversations. dues templates email communications Mar 30, 2026 Read more" [ref=e62] [cursor=pointer]:
+            - /url: /blog/dues-reminder-email-templates
+            - generic [ref=e63]:
+              - generic [ref=e64]: Tools & Templates
+              - generic [ref=e65]:
+                - img [ref=e66]
+                - text: 6 min read
+            - heading "5 Free Dues Reminder Email Templates That Actually Get Paid" [level=3] [ref=e69]
+            - paragraph [ref=e70]: Chasing down dues payments is exhausting. Use these 5 copy-paste email templates to collect membership dues without the awkward conversations.
+            - generic [ref=e71]:
+              - generic [ref=e72]: dues
+              - generic [ref=e73]: templates
+              - generic [ref=e74]: email
+              - generic [ref=e75]: communications
+            - generic [ref=e76]:
+              - generic [ref=e77]:
+                - img [ref=e78]
+                - text: Mar 30, 2026
+              - generic [ref=e80]:
+                - text: Read more
+                - img [ref=e81]
+          - link "Growth & Engagement 7 min read Why New Members Quit After 3 Months (And How to Fix It) Most clubs lose new members within the first 90 days. Learn why it happens and the proven strategies to keep them engaged past the critical 3-month mark. retention engagement onboarding Mar 30, 2026 Read more" [ref=e83] [cursor=pointer]:
+            - /url: /blog/why-new-members-quit
+            - generic [ref=e84]:
+              - generic [ref=e85]: Growth & Engagement
+              - generic [ref=e86]:
+                - img [ref=e87]
+                - text: 7 min read
+            - heading "Why New Members Quit After 3 Months (And How to Fix It)" [level=3] [ref=e90]
+            - paragraph [ref=e91]: Most clubs lose new members within the first 90 days. Learn why it happens and the proven strategies to keep them engaged past the critical 3-month mark.
+            - generic [ref=e92]:
+              - generic [ref=e93]: retention
+              - generic [ref=e94]: engagement
+              - generic [ref=e95]: onboarding
+            - generic [ref=e96]:
+              - generic [ref=e97]:
+                - img [ref=e98]
+                - text: Mar 30, 2026
+              - generic [ref=e100]:
+                - text: Read more
+                - img [ref=e101]
+          - 'link "Seasonal Playbooks 9 min read Youth Sports Season Kickoff Checklist: 15 Things to Do Before Opening Day Opening day is coming. Make sure you have everything covered with this 15-item checklist for youth sports season prep. youth-sports checklist season-prep Mar 30, 2026 Read more" [ref=e103] [cursor=pointer]':
+            - /url: /blog/youth-sports-season-kickoff
+            - generic [ref=e104]:
+              - generic [ref=e105]: Seasonal Playbooks
+              - generic [ref=e106]:
+                - img [ref=e107]
+                - text: 9 min read
+            - 'heading "Youth Sports Season Kickoff Checklist: 15 Things to Do Before Opening Day" [level=3] [ref=e110]'
+            - paragraph [ref=e111]: Opening day is coming. Make sure you have everything covered with this 15-item checklist for youth sports season prep.
+            - generic [ref=e112]:
+              - generic [ref=e113]: youth-sports
+              - generic [ref=e114]: checklist
+              - generic [ref=e115]: season-prep
+            - generic [ref=e116]:
+              - generic [ref=e117]:
+                - img [ref=e118]
+                - text: Mar 30, 2026
+              - generic [ref=e120]:
+                - text: Read more
+                - img [ref=e121]
+          - link "Operational How-Tos 7 min read How to Run a Volunteer Sign-Up That Fills Every Slot Tired of empty volunteer slots? These 5 strategies will help you fill every position without begging. volunteers sign-ups how-to Mar 30, 2026 Read more" [ref=e123] [cursor=pointer]:
+            - /url: /blog/volunteer-signup-that-fills
+            - generic [ref=e124]:
+              - generic [ref=e125]: Operational How-Tos
+              - generic [ref=e126]:
+                - img [ref=e127]
+                - text: 7 min read
+            - heading "How to Run a Volunteer Sign-Up That Fills Every Slot" [level=3] [ref=e130]
+            - paragraph [ref=e131]: Tired of empty volunteer slots? These 5 strategies will help you fill every position without begging.
+            - generic [ref=e132]:
+              - generic [ref=e133]: volunteers
+              - generic [ref=e134]: sign-ups
+              - generic [ref=e135]: how-to
+            - generic [ref=e136]:
+              - generic [ref=e137]:
+                - img [ref=e138]
+                - text: Mar 30, 2026
+              - generic [ref=e140]:
+                - text: Read more
+                - img [ref=e141]
+          - 'link "Club Type Spotlights 8 min read Adult Rec League Scheduling: Round Robin vs. Bracket (With Free Generator) Not sure whether to run a round robin or bracket for your rec league? This guide breaks down both formats with formulas and examples. scheduling adult-rec league-management Mar 30, 2026 Read more" [ref=e143] [cursor=pointer]':
+            - /url: /blog/rec-league-scheduling-guide
+            - generic [ref=e144]:
+              - generic [ref=e145]: Club Type Spotlights
+              - generic [ref=e146]:
+                - img [ref=e147]
+                - text: 8 min read
+            - 'heading "Adult Rec League Scheduling: Round Robin vs. Bracket (With Free Generator)" [level=3] [ref=e150]'
+            - paragraph [ref=e151]: Not sure whether to run a round robin or bracket for your rec league? This guide breaks down both formats with formulas and examples.
+            - generic [ref=e152]:
+              - generic [ref=e153]: scheduling
+              - generic [ref=e154]: adult-rec
+              - generic [ref=e155]: league-management
+            - generic [ref=e156]:
+              - generic [ref=e157]:
+                - img [ref=e158]
+                - text: Mar 30, 2026
+              - generic [ref=e160]:
+                - text: Read more
+                - img [ref=e161]
+          - link "Tools & Templates 7 min read The Real Cost of Running a Club on Spreadsheets (Calculator Inside) Your spreadsheet is \"free\" but costs your club $200-700/month in volunteer time. Here is the math — and what to do about it. spreadsheets cost-analysis software Mar 30, 2026 Read more" [ref=e163] [cursor=pointer]:
+            - /url: /blog/real-cost-of-spreadsheets
+            - generic [ref=e164]:
+              - generic [ref=e165]: Tools & Templates
+              - generic [ref=e166]:
+                - img [ref=e167]
+                - text: 7 min read
+            - heading "The Real Cost of Running a Club on Spreadsheets (Calculator Inside)" [level=3] [ref=e170]
+            - paragraph [ref=e171]: Your spreadsheet is "free" but costs your club $200-700/month in volunteer time. Here is the math — and what to do about it.
+            - generic [ref=e172]:
+              - generic [ref=e173]: spreadsheets
+              - generic [ref=e174]: cost-analysis
+              - generic [ref=e175]: software
+            - generic [ref=e176]:
+              - generic [ref=e177]:
+                - img [ref=e178]
+                - text: Mar 30, 2026
+              - generic [ref=e180]:
+                - text: Read more
+                - img [ref=e181]
+          - link "Growth & Engagement 6 min read How to Write a Club Newsletter People Actually Open Your club newsletter doesn not have to be boring. Use this 3-section formula and subject line tricks to get members to actually open it. newsletter email communications engagement Mar 30, 2026 Read more" [ref=e183] [cursor=pointer]:
+            - /url: /blog/club-newsletter-tips
+            - generic [ref=e184]:
+              - generic [ref=e185]: Growth & Engagement
+              - generic [ref=e186]:
+                - img [ref=e187]
+                - text: 6 min read
+            - heading "How to Write a Club Newsletter People Actually Open" [level=3] [ref=e190]
+            - paragraph [ref=e191]: Your club newsletter doesn not have to be boring. Use this 3-section formula and subject line tricks to get members to actually open it.
+            - generic [ref=e192]:
+              - generic [ref=e193]: newsletter
+              - generic [ref=e194]: email
+              - generic [ref=e195]: communications
+              - generic [ref=e196]: engagement
+            - generic [ref=e197]:
+              - generic [ref=e198]:
+                - img [ref=e199]
+                - text: Mar 30, 2026
+              - generic [ref=e201]:
+                - text: Read more
+                - img [ref=e202]
+          - 'link "Seasonal Playbooks 8 min read End-of-Season Wrap-Up: How to Retain 90% of Members for Next Year Clubs lose 20-40% of members between seasons. This 4-step playbook keeps them coming back. retention season-end renewals Mar 30, 2026 Read more" [ref=e204] [cursor=pointer]':
+            - /url: /blog/end-of-season-member-retention
+            - generic [ref=e205]:
+              - generic [ref=e206]: Seasonal Playbooks
+              - generic [ref=e207]:
+                - img [ref=e208]
+                - text: 8 min read
+            - 'heading "End-of-Season Wrap-Up: How to Retain 90% of Members for Next Year" [level=3] [ref=e211]'
+            - paragraph [ref=e212]: Clubs lose 20-40% of members between seasons. This 4-step playbook keeps them coming back.
+            - generic [ref=e213]:
+              - generic [ref=e214]: retention
+              - generic [ref=e215]: season-end
+              - generic [ref=e216]: renewals
+            - generic [ref=e217]:
+              - generic [ref=e218]:
+                - img [ref=e219]
+                - text: Mar 30, 2026
+              - generic [ref=e221]:
+                - text: Read more
+                - img [ref=e222]
+          - 'link "Club Type Spotlights 9 min read Starting a Book Club in 2026: Complete Guide From First Meeting to 50 Members Want to start a book club? This guide covers everything from your first meeting format to growing to 50+ members. book-clubs getting-started growth Mar 30, 2026 Read more" [ref=e224] [cursor=pointer]':
+            - /url: /blog/starting-a-book-club-guide
+            - generic [ref=e225]:
+              - generic [ref=e226]: Club Type Spotlights
+              - generic [ref=e227]:
+                - img [ref=e228]
+                - text: 9 min read
+            - 'heading "Starting a Book Club in 2026: Complete Guide From First Meeting to 50 Members" [level=3] [ref=e231]'
+            - paragraph [ref=e232]: Want to start a book club? This guide covers everything from your first meeting format to growing to 50+ members.
+            - generic [ref=e233]:
+              - generic [ref=e234]: book-clubs
+              - generic [ref=e235]: getting-started
+              - generic [ref=e236]: growth
+            - generic [ref=e237]:
+              - generic [ref=e238]:
+                - img [ref=e239]
+                - text: Mar 30, 2026
+              - generic [ref=e241]:
+                - text: Read more
+                - img [ref=e242]
+          - link "Operational How-Tos 7 min read How to Handle Late Dues Without Losing Members Late dues are awkward for everyone. This 5-step framework collects what is owed without burning bridges. dues payments collections Mar 30, 2026 Read more" [ref=e244] [cursor=pointer]:
+            - /url: /blog/handling-late-dues
+            - generic [ref=e245]:
+              - generic [ref=e246]: Operational How-Tos
+              - generic [ref=e247]:
+                - img [ref=e248]
+                - text: 7 min read
+            - heading "How to Handle Late Dues Without Losing Members" [level=3] [ref=e251]
+            - paragraph [ref=e252]: Late dues are awkward for everyone. This 5-step framework collects what is owed without burning bridges.
+            - generic [ref=e253]:
+              - generic [ref=e254]: dues
+              - generic [ref=e255]: payments
+              - generic [ref=e256]: collections
+            - generic [ref=e257]:
+              - generic [ref=e258]:
+                - img [ref=e259]
+                - text: Mar 30, 2026
+              - generic [ref=e261]:
+                - text: Read more
+                - img [ref=e262]
+          - link "Growth & Engagement 8 min read 7 Fundraising Ideas That Raised $5K+ for Small Clubs Need to raise money for your club? These 7 ideas have raised $5K+ for small organizations — without a huge time commitment. fundraising revenue nonprofit Mar 30, 2026 Read more" [ref=e264] [cursor=pointer]:
+            - /url: /blog/fundraising-ideas-small-clubs
+            - generic [ref=e265]:
+              - generic [ref=e266]: Growth & Engagement
+              - generic [ref=e267]:
+                - img [ref=e268]
+                - text: 8 min read
+            - heading "7 Fundraising Ideas That Raised $5K+ for Small Clubs" [level=3] [ref=e271]
+            - paragraph [ref=e272]: Need to raise money for your club? These 7 ideas have raised $5K+ for small organizations — without a huge time commitment.
+            - generic [ref=e273]:
+              - generic [ref=e274]: fundraising
+              - generic [ref=e275]: revenue
+              - generic [ref=e276]: nonprofit
+            - generic [ref=e277]:
+              - generic [ref=e278]:
+                - img [ref=e279]
+                - text: Mar 30, 2026
+              - generic [ref=e281]:
+                - text: Read more
+                - img [ref=e282]
+          - 'link "Club Type Spotlights 7 min read Nonprofit Volunteer Hour Tracking: Paper vs. App (Comparison) Still tracking volunteer hours on paper? See how paper and app-based tracking compare on cost, accuracy, and reporting. volunteers tracking nonprofit comparison Mar 30, 2026 Read more" [ref=e284] [cursor=pointer]':
+            - /url: /blog/volunteer-hour-tracking-comparison
+            - generic [ref=e285]:
+              - generic [ref=e286]: Club Type Spotlights
+              - generic [ref=e287]:
+                - img [ref=e288]
+                - text: 7 min read
+            - 'heading "Nonprofit Volunteer Hour Tracking: Paper vs. App (Comparison)" [level=3] [ref=e291]'
+            - paragraph [ref=e292]: Still tracking volunteer hours on paper? See how paper and app-based tracking compare on cost, accuracy, and reporting.
+            - generic [ref=e293]:
+              - generic [ref=e294]: volunteers
+              - generic [ref=e295]: tracking
+              - generic [ref=e296]: nonprofit
+              - generic [ref=e297]: comparison
+            - generic [ref=e298]:
+              - generic [ref=e299]:
+                - img [ref=e300]
+                - text: Mar 30, 2026
+              - generic [ref=e302]:
+                - text: Read more
+                - img [ref=e303]
+          - link "Seasonal Playbooks 8 min read How to Plan Your Club's Annual Calendar (Free Template + Walkthrough) Stop planning month-to-month. This 4-step process and free template help you map out your club's entire year. planning calendar templates organization Mar 30, 2026 Read more" [ref=e305] [cursor=pointer]:
+            - /url: /blog/club-annual-calendar-template
+            - generic [ref=e306]:
+              - generic [ref=e307]: Seasonal Playbooks
+              - generic [ref=e308]:
+                - img [ref=e309]
+                - text: 8 min read
+            - heading "How to Plan Your Club's Annual Calendar (Free Template + Walkthrough)" [level=3] [ref=e312]
+            - paragraph [ref=e313]: Stop planning month-to-month. This 4-step process and free template help you map out your club's entire year.
+            - generic [ref=e314]:
+              - generic [ref=e315]: planning
+              - generic [ref=e316]: calendar
+              - generic [ref=e317]: templates
+              - generic [ref=e318]: organization
+            - generic [ref=e319]:
+              - generic [ref=e320]:
+                - img [ref=e321]
+                - text: Mar 30, 2026
+              - generic [ref=e323]:
+                - text: Read more
+                - img [ref=e324]
+          - link "Operational How-Tos 8 min read How to Transition Your Club from Paper to Digital Without Mutiny Ready to ditch the spreadsheets but worried about pushback? This phased approach gets your whole club on board. digital-transition change-management software Mar 30, 2026 Read more" [ref=e326] [cursor=pointer]:
+            - /url: /blog/paper-to-digital-transition
+            - generic [ref=e327]:
+              - generic [ref=e328]: Operational How-Tos
+              - generic [ref=e329]:
+                - img [ref=e330]
+                - text: 8 min read
+            - heading "How to Transition Your Club from Paper to Digital Without Mutiny" [level=3] [ref=e333]
+            - paragraph [ref=e334]: Ready to ditch the spreadsheets but worried about pushback? This phased approach gets your whole club on board.
+            - generic [ref=e335]:
+              - generic [ref=e336]: digital-transition
+              - generic [ref=e337]: change-management
+              - generic [ref=e338]: software
+            - generic [ref=e339]:
+              - generic [ref=e340]:
+                - img [ref=e341]
+                - text: Mar 30, 2026
+              - generic [ref=e343]:
+                - text: Read more
+                - img [ref=e344]
+      - generic [ref=e347]:
+        - heading "Ready to simplify your club management?" [level=2] [ref=e348]
+        - paragraph [ref=e349]: Start with a 30-day free trial on any plan. Cancel anytime.
+        - generic [ref=e350]:
+          - link "See How GatherGrove Helps" [ref=e351] [cursor=pointer]:
+            - /url: /features
+            - text: See How GatherGrove Helps
+            - img [ref=e352]
+          - link "Explore More Guides" [ref=e354] [cursor=pointer]:
+            - /url: /resources
+      - generic [ref=e356]:
+        - generic [ref=e357]:
+          - generic [ref=e358]:
+            - img "GatherGrove" [ref=e360]
+            - paragraph [ref=e361]: Simple, affordable membership and event management for organizations of all types.
+            - generic [ref=e362]:
+              - generic [ref=e363]:
+                - textbox "Email address" [ref=e364]:
+                  - /placeholder: Your email
+                - button "Subscribe" [ref=e365] [cursor=pointer]
+              - paragraph [ref=e366]: Weekly club management tips. No spam.
+          - generic [ref=e367]:
+            - heading "Product" [level=3] [ref=e368]
+            - list [ref=e369]:
+              - listitem [ref=e370]:
+                - link "Features" [ref=e371] [cursor=pointer]:
+                  - /url: /features
+              - listitem [ref=e372]:
+                - link "Pricing" [ref=e373] [cursor=pointer]:
+                  - /url: /pricing
+              - listitem [ref=e374]:
+                - link "About" [ref=e375] [cursor=pointer]:
+                  - /url: /about
+              - listitem [ref=e376]:
+                - link "Club Types" [ref=e377] [cursor=pointer]:
+                  - /url: /for
+          - generic [ref=e378]:
+            - heading "Learn" [level=3] [ref=e379]
+            - list [ref=e380]:
+              - listitem [ref=e381]:
+                - link "Resource Library" [ref=e382] [cursor=pointer]:
+                  - /url: /resources
+              - listitem [ref=e383]:
+                - link "Glossary" [ref=e384] [cursor=pointer]:
+                  - /url: /glossary
+              - listitem [ref=e385]:
+                - link "Formation Guides" [ref=e386] [cursor=pointer]:
+                  - /url: /how-to-start
+              - listitem [ref=e387]:
+                - link "Compare Platforms" [ref=e388] [cursor=pointer]:
+                  - /url: /compare
+              - listitem [ref=e389]:
+                - link "FAQ" [ref=e390] [cursor=pointer]:
+                  - /url: /faq
+              - listitem [ref=e391]:
+                - link "Alternatives" [ref=e392] [cursor=pointer]:
+                  - /url: /alternatives
+              - listitem [ref=e393]:
+                - link "Templates" [ref=e394] [cursor=pointer]:
+                  - /url: /templates
+              - listitem [ref=e395]:
+                - link "Volunteer Management" [ref=e396] [cursor=pointer]:
+                  - /url: /volunteer-management
+              - listitem [ref=e397]:
+                - link "Free Tools" [ref=e398] [cursor=pointer]:
+                  - /url: /tools
+          - generic [ref=e399]:
+            - heading "Legal" [level=3] [ref=e400]
+            - list [ref=e401]:
+              - listitem [ref=e402]:
+                - link "Terms of Service" [ref=e403] [cursor=pointer]:
+                  - /url: /terms-of-service
+              - listitem [ref=e404]:
+                - link "Privacy Policy" [ref=e405] [cursor=pointer]:
+                  - /url: /privacy-policy
+              - listitem [ref=e406]:
+                - link "Help & Support" [ref=e407] [cursor=pointer]:
+                  - /url: /support
+          - generic [ref=e408]:
+            - heading "Get Started" [level=3] [ref=e409]
+            - generic [ref=e411]:
+              - link "Start Free Trial" [ref=e412] [cursor=pointer]:
+                - /url: /register
+              - link "Learn More" [ref=e413] [cursor=pointer]:
+                - /url: /#features
+        - generic [ref=e414]: © 2026 GatherGrove. All rights reserved.
+  - region "Notifications alt+T"
+  - generic [ref=e417]:
+    - img [ref=e418]
+    - text: Online
+  - button "Send feedback" [ref=e422] [cursor=pointer]:
+    - img [ref=e423]
+  - alert [ref=e426]
